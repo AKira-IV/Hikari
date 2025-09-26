@@ -18,22 +18,22 @@ describe('AppController (e2e)', () => {
         AppModule,
       ],
     })
-    .overrideModule(TypeOrmModule)
-    .useModule(
-      TypeOrmModule.forRoot({
-        type: 'postgres',
-        host: process.env.DATABASE_HOST || 'localhost',
-        port: parseInt(process.env.DATABASE_PORT || '5432', 10),
-        username: process.env.DATABASE_USERNAME || 'hikari_user',
-        password: process.env.DATABASE_PASSWORD || 'hikari_password',
-        database: process.env.DATABASE_NAME || 'hikari_test',
-        entities: [],
-        synchronize: true,
-        autoLoadEntities: true,
-        dropSchema: true,
-      })
-    )
-    .compile();
+      .overrideModule(TypeOrmModule)
+      .useModule(
+        TypeOrmModule.forRoot({
+          type: 'postgres',
+          host: process.env.DATABASE_HOST || 'localhost',
+          port: parseInt(process.env.DATABASE_PORT || '5432', 10),
+          username: process.env.DATABASE_USERNAME || 'hikari_user',
+          password: process.env.DATABASE_PASSWORD || 'hikari_password',
+          database: process.env.DATABASE_NAME || 'hikari_test',
+          entities: [],
+          synchronize: true,
+          autoLoadEntities: true,
+          dropSchema: true,
+        }),
+      )
+      .compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();

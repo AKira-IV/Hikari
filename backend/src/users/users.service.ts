@@ -14,7 +14,17 @@ export class UsersService {
     return this.userRepository.find({
       where: { tenantId, isActive: true },
       relations: ['tenant'],
-      select: ['id', 'email', 'firstName', 'lastName', 'role', 'phone', 'isActive', 'createdAt', 'updatedAt']
+      select: [
+        'id',
+        'email',
+        'firstName',
+        'lastName',
+        'role',
+        'phone',
+        'isActive',
+        'createdAt',
+        'updatedAt',
+      ],
     });
   }
 
@@ -22,7 +32,19 @@ export class UsersService {
     const user = await this.userRepository.findOne({
       where: { id, tenantId, isActive: true },
       relations: ['tenant'],
-      select: ['id', 'email', 'firstName', 'lastName', 'role', 'phone', 'address', 'dateOfBirth', 'isActive', 'createdAt', 'updatedAt']
+      select: [
+        'id',
+        'email',
+        'firstName',
+        'lastName',
+        'role',
+        'phone',
+        'address',
+        'dateOfBirth',
+        'isActive',
+        'createdAt',
+        'updatedAt',
+      ],
     });
 
     if (!user) {
@@ -32,16 +54,25 @@ export class UsersService {
     return user;
   }
 
-  async updateUser(id: string, tenantId: string, updateData: Partial<User>): Promise<User> {
+  async updateUser(
+    id: string,
+    tenantId: string,
+    updateData: Partial<User>,
+  ): Promise<User> {
     const user = await this.findOneById(id, tenantId);
 
     // Remove sensitive fields that shouldn't be updated via this method
-    const { password, tenantId: _, ...safeUpdateData } = updateData as any;
+
+    const {
+      password: _,
+      tenantId: __,
+      ...safeUpdateData
+    } = updateData as Partial<User> & { password?: string; tenantId?: string };
 
     Object.assign(user, safeUpdateData);
     const updatedUser = await this.userRepository.save(user);
 
-    const { password: __, ...userWithoutPassword } = updatedUser;
+    const { password: _updatedPassword, ...userWithoutPassword } = updatedUser;
     return userWithoutPassword as User;
   }
 
@@ -55,7 +86,16 @@ export class UsersService {
     return this.userRepository.find({
       where: { role, tenantId, isActive: true },
       relations: ['tenant'],
-      select: ['id', 'email', 'firstName', 'lastName', 'role', 'phone', 'isActive', 'createdAt']
+      select: [
+        'id',
+        'email',
+        'firstName',
+        'lastName',
+        'role',
+        'phone',
+        'isActive',
+        'createdAt',
+      ],
     });
   }
 }
