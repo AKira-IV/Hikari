@@ -11,6 +11,7 @@ import { UsersModule } from './users/users.module';
 import { User } from './database/entities/user.entity';
 import { Tenant } from './database/entities/tenant.entity';
 import { SeedService } from './database/seeds/seed.service';
+import { CommonSecurityModule } from './common/common-security.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { SeedService } from './database/seeds/seed.service';
       synchronize: process.env.NODE_ENV !== 'production',
     }),
     TypeOrmModule.forFeature([User, Tenant]),
+    CommonSecurityModule,
     AuthModule,
     AppointmentsModule,
     PatientsModule,
