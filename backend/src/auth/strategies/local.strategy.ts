@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { AuthService } from '../auth.service';
+import { Request } from 'express';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -12,9 +13,17 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(req: any, email: string, password: string): Promise<any> {
-    const tenantSubdomain = req.body.tenantSubdomain;
-    const user = await this.authService.validateUser(email, password, tenantSubdomain);
+  async validate(req: Request, email: string, password: string): Promise<any> {
+    const tenantSubdomain = (req.body as { tenantSubdomain?: string })
+      .tenantSubdomain;
+    if (!tenantSubdomain) {
+      throw new UnauthorizedException('Tenant subdomain is required');
+    }
+    const user = await this.authService.validateUser(
+      email,
+      password,
+      tenantSubdomain,
+    );
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }

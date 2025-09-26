@@ -19,7 +19,7 @@ export class SeedService {
 
     // Create demo tenant
     const existingTenant = await this.tenantRepository.findOne({
-      where: { subdomain: 'demo' }
+      where: { subdomain: 'demo' },
     });
 
     let tenant: Tenant;
@@ -39,7 +39,7 @@ export class SeedService {
 
     // Create admin user
     const existingAdmin = await this.userRepository.findOne({
-      where: { email: 'admin@demo.com', tenantId: tenant.id }
+      where: { email: 'admin@demo.com', tenantId: tenant.id },
     });
 
     if (!existingAdmin) {
@@ -60,7 +60,7 @@ export class SeedService {
 
     // Create doctor user
     const existingDoctor = await this.userRepository.findOne({
-      where: { email: 'doctor@demo.com', tenantId: tenant.id }
+      where: { email: 'doctor@demo.com', tenantId: tenant.id },
     });
 
     if (!existingDoctor) {
@@ -82,7 +82,7 @@ export class SeedService {
 
     // Create nurse user
     const existingNurse = await this.userRepository.findOne({
-      where: { email: 'nurse@demo.com', tenantId: tenant.id }
+      where: { email: 'nurse@demo.com', tenantId: tenant.id },
     });
 
     if (!existingNurse) {

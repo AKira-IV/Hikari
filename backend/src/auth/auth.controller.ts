@@ -1,8 +1,25 @@
-import { Controller, Post, Body, UseGuards, Request, Get } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+  Get,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto, CreateTenantDto } from './dto/auth.dto';
+import { User } from '../database/entities/user.entity';
+
+interface RequestWithUser extends Request {
+  user: User;
+}
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -14,7 +31,7 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   @Post('login')
   @UseGuards(AuthGuard('local'))
-  async login(@Request() req, @Body() loginDto: LoginDto) {
+  async login(@Request() req: RequestWithUser, @Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
 
@@ -35,11 +52,14 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Get current user profile' })
-  @ApiResponse({ status: 200, description: 'User profile retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'User profile retrieved successfully',
+  })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Get('profile')
-  getProfile(@Request() req) {
+  getProfile(@Request() req: RequestWithUser): User {
     return req.user;
   }
 }

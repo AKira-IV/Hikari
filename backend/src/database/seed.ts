@@ -17,4 +17,5 @@ async function runSeeds() {
   }
 }
 
-runSeeds();
+// Handle seed errors
+runSeeds().catch(console.error);

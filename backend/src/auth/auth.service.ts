@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -16,9 +21,13 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, password: string, tenantSubdomain: string): Promise<User | null> {
+  async validateUser(
+    email: string,
+    password: string,
+    tenantSubdomain: string,
+  ): Promise<User | null> {
     const tenant = await this.tenantRepository.findOne({
-      where: { subdomain: tenantSubdomain, isActive: true }
+      where: { subdomain: tenantSubdomain, isActive: true },
     });
 
     if (!tenant) {
@@ -27,10 +36,10 @@ export class AuthService {
 
     const user = await this.userRepository.findOne({
       where: { email, tenantId: tenant.id, isActive: true },
-      relations: ['tenant']
+      relations: ['tenant'],
     });
 
-    if (user && await user.validatePassword(password)) {
+    if (user && (await user.validatePassword(password))) {
       return user;
     }
     return null;
@@ -39,12 +48,16 @@ export class AuthService {
   async findUserById(userId: string): Promise<User | null> {
     return this.userRepository.findOne({
       where: { id: userId, isActive: true },
-      relations: ['tenant']
+      relations: ['tenant'],
     });
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.validateUser(loginDto.email, loginDto.password, loginDto.tenantSubdomain);
+    const user = await this.validateUser(
+      loginDto.email,
+      loginDto.password,
+      loginDto.tenantSubdomain,
+    );
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -54,7 +67,7 @@ export class AuthService {
       sub: user.id,
       role: user.role,
       tenantId: user.tenantId,
-      tenantSubdomain: user.tenant.subdomain
+      tenantSubdomain: user.tenant.subdomain,
     };
 
     return {
@@ -68,15 +81,15 @@ export class AuthService {
         tenant: {
           id: user.tenant.id,
           name: user.tenant.name,
-          subdomain: user.tenant.subdomain
-        }
-      }
+          subdomain: user.tenant.subdomain,
+        },
+      },
     };
   }
 
   async register(registerDto: RegisterDto) {
     const tenant = await this.tenantRepository.findOne({
-      where: { subdomain: registerDto.tenantSubdomain, isActive: true }
+      where: { subdomain: registerDto.tenantSubdomain, isActive: true },
     });
 
     if (!tenant) {
@@ -84,7 +97,7 @@ export class AuthService {
     }
 
     const existingUser = await this.userRepository.findOne({
-      where: { email: registerDto.email, tenantId: tenant.id }
+      where: { email: registerDto.email, tenantId: tenant.id },
     });
 
     if (existingUser) {
@@ -99,20 +112,21 @@ export class AuthService {
       phone: registerDto.phone,
       address: registerDto.address,
       role: registerDto.role || UserRole.PATIENT,
-      tenantId: tenant.id
+      tenantId: tenant.id,
     });
 
     const savedUser = await this.userRepository.save(user);
 
     // Remove password from response
-    const { password, ...userWithoutPassword } = savedUser;
+
+    const { password: _, ...userWithoutPassword } = savedUser;
     return userWithoutPassword;
   }
 
   async createTenant(createTenantDto: CreateTenantDto) {
     // Check if tenant subdomain already exists
     const existingTenant = await this.tenantRepository.findOne({
-      where: { subdomain: createTenantDto.subdomain }
+      where: { subdomain: createTenantDto.subdomain },
     });
 
     if (existingTenant) {
@@ -121,7 +135,7 @@ export class AuthService {
 
     // Check if admin email already exists in any tenant
     const existingUser = await this.userRepository.findOne({
-      where: { email: createTenantDto.adminEmail }
+      where: { email: createTenantDto.adminEmail },
     });
 
     if (existingUser) {
@@ -132,7 +146,7 @@ export class AuthService {
     const tenant = this.tenantRepository.create({
       name: createTenantDto.name,
       subdomain: createTenantDto.subdomain,
-      description: createTenantDto.description
+      description: createTenantDto.description,
     });
 
     const savedTenant = await this.tenantRepository.save(tenant);
@@ -144,7 +158,7 @@ export class AuthService {
       firstName: createTenantDto.adminFirstName,
       lastName: createTenantDto.adminLastName,
       role: UserRole.ADMIN,
-      tenantId: savedTenant.id
+      tenantId: savedTenant.id,
     });
 
     await this.userRepository.save(adminUser);
@@ -154,14 +168,14 @@ export class AuthService {
         id: savedTenant.id,
         name: savedTenant.name,
         subdomain: savedTenant.subdomain,
-        description: savedTenant.description
-      }
+        description: savedTenant.description,
+      },
     };
   }
 
   async findTenantBySubdomain(subdomain: string): Promise<Tenant | null> {
     return this.tenantRepository.findOne({
-      where: { subdomain, isActive: true }
+      where: { subdomain, isActive: true },
     });
   }
 }

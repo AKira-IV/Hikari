@@ -1,8 +1,21 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Put,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { CurrentUser, CurrentTenant } from '../common/decorators';
+import { CurrentTenant } from '../common/decorators';
 import { Roles, RolesGuard } from '../common/guards';
 import { User, UserRole } from '../database/entities/user.entity';
 import { Tenant } from '../database/entities/tenant.entity';
@@ -36,7 +49,7 @@ export class UsersController {
   async update(
     @Param('id') id: string,
     @Body() updateData: Partial<User>,
-    @CurrentTenant() tenant: Tenant
+    @CurrentTenant() tenant: Tenant,
   ) {
     return this.usersService.updateUser(id, tenant.id, updateData);
   }
@@ -54,7 +67,10 @@ export class UsersController {
   @ApiOperation({ summary: 'Get users by role' })
   @ApiResponse({ status: 200, description: 'Users retrieved successfully' })
   @Get('role/:role')
-  async findByRole(@Param('role') role: UserRole, @CurrentTenant() tenant: Tenant) {
+  async findByRole(
+    @Param('role') role: UserRole,
+    @CurrentTenant() tenant: Tenant,
+  ) {
     return this.usersService.findByRole(role, tenant.id);
   }
 }

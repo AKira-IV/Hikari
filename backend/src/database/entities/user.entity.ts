@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, BeforeInsert } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  BeforeInsert,
+} from 'typeorm';
 import { Tenant } from './tenant.entity';
 import * as bcrypt from 'bcryptjs';
 
@@ -30,7 +39,7 @@ export class User {
   @Column({
     type: 'enum',
     enum: UserRole,
-    default: UserRole.PATIENT
+    default: UserRole.PATIENT,
   })
   role: UserRole;
 
@@ -49,7 +58,7 @@ export class User {
   @Column({ type: 'json', nullable: true })
   metadata: Record<string, any>;
 
-  @ManyToOne(() => Tenant, tenant => tenant.users, { nullable: false })
+  @ManyToOne(() => Tenant, (tenant) => tenant.users, { nullable: false })
   @JoinColumn({ name: 'tenantId' })
   tenant: Tenant;
 

@@ -1,35 +1,70 @@
-import { IsEmail, IsNotEmpty, MinLength, IsOptional, IsEnum } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  MinLength,
+  IsOptional,
+  IsEnum,
+  IsAlphanumeric,
+  MaxLength,
+} from 'class-validator';
 import { UserRole } from '../../database/entities/user.entity';
+import {
+  IsNotSQLInjection,
+  IsNotXSS,
+  IsStrongPassword,
+  IsSecureInput,
+} from '../../common/validators/security.validators';
 
 export class LoginDto {
   @IsEmail()
+  @IsNotXSS()
+  @IsNotSQLInjection()
   email: string;
 
   @IsNotEmpty()
+  @IsSecureInput()
   password: string;
 
   @IsNotEmpty()
+  @IsAlphanumeric()
+  @MaxLength(50)
+  @IsNotXSS()
+  @IsNotSQLInjection()
   tenantSubdomain: string;
 }
 
 export class RegisterDto {
   @IsEmail()
+  @IsNotXSS()
+  @IsNotSQLInjection()
   email: string;
 
   @IsNotEmpty()
-  @MinLength(6)
+  @MinLength(8)
+  @IsStrongPassword()
   password: string;
 
   @IsNotEmpty()
+  @MaxLength(100)
+  @IsNotXSS()
+  @IsNotSQLInjection()
   firstName: string;
 
   @IsNotEmpty()
+  @MaxLength(100)
+  @IsNotXSS()
+  @IsNotSQLInjection()
   lastName: string;
 
   @IsOptional()
+  @MaxLength(20)
+  @IsSecureInput()
   phone?: string;
 
   @IsOptional()
+  @MaxLength(500)
+  @IsNotXSS()
+  @IsNotSQLInjection()
   address?: string;
 
   @IsEnum(UserRole)
@@ -37,11 +72,18 @@ export class RegisterDto {
   role?: UserRole;
 
   @IsNotEmpty()
+  @IsAlphanumeric()
+  @MaxLength(50)
+  @IsNotXSS()
+  @IsNotSQLInjection()
   tenantSubdomain: string;
 }
 
 export class CreateTenantDto {
   @IsNotEmpty()
+  @MaxLength(200)
+  @IsNotXSS()
+  @IsNotSQLInjection()
   name: string;
 
   @IsNotEmpty()
