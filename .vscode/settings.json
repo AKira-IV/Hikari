@@ -42,5 +42,6 @@
       "formulahendry.auto-rename-tag",
       "ms-vscode.vscode-json"
     ]
-  }
+  },
+  "makefile.configureOnOpen": true
 }

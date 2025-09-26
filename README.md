@@ -33,7 +33,7 @@ Hikari es un sistema de gestión hospitalaria basado en la experiencia y estruct
 - **CI/CD:** GitHub Actions
 - **Monitoreo:** Health checks integrados
 
-## 🛠️ Instalación y Uso
+## Instalación y Uso
 
 ### Opción 1: Docker (Recomendado)
 
@@ -75,7 +75,7 @@ npm run start:dev
 npm run seed
 ```
 
-### 🐳 Comandos Docker Disponibles
+### Comandos Docker Disponibles
 
 ```bash
 # Desarrollo
@@ -95,7 +95,7 @@ make health          # Verificar salud de servicios
 make test            # Ejecutar tests
 ```
 
-## 🔑 Acceso al Sistema
+## Acceso al Sistema
 
 Después de ejecutar `make seed`, puedes acceder con:
 
@@ -104,7 +104,7 @@ Después de ejecutar `make seed`, puedes acceder con:
 - **Doctor**: doctor@demo.com / doctor123
 - **Nurse**: nurse@demo.com / nurse123
 
-## 📚 Documentación API
+## Documentación API
 
 Una vez iniciado el backend, la documentación completa de la API está disponible en:
 - **Swagger UI**: http://localhost:3000/api
@@ -130,31 +130,31 @@ Authorization: Bearer {token}
 
 ## 🏗️ Roadmap del Proyecto
 
-### Fase 1: Base del Proyecto ✅
+### Fase 1: Base del Proyecto
 - [x] Configuración Docker y CI/CD
 - [x] Autenticación y Gestión de Usuarios
 - [x] Sistema Multi-Tenant
 - [x] API Base con Swagger
 
-### Fase 2: Módulos Principales 🚧
+### Fase 2: Módulos Principales
 - [ ] Módulo de Pacientes completo
 - [ ] Módulo de Profesionales completo
 - [ ] Módulo de Citas Médicas
 - [ ] Dashboard y reportes básicos
 
-### Fase 3: Funcionalidades Avanzadas 📋
+### Fase 3: Funcionalidades Avanzadas
 - [ ] Sistema de permisos granular
 - [ ] Notificaciones en tiempo real
 - [ ] Integración con APIs externas
 - [ ] Reportes avanzados y analytics
 
-### Fase 4: Producción 🚀
+### Fase 4: Producción
 - [ ] Monitoreo y logging avanzado
 - [ ] Backups automatizados
 - [ ] Escalabilidad horizontal
 - [ ] Documentación completa
 
-## 🧪 Testing y CI/CD
+## Testing y CI/CD
 
 ### GitHub Actions
 El proyecto incluye workflows automáticos que se ejecutan en cada push:
@@ -172,7 +172,7 @@ make test-e2e       # Tests end-to-end
 make test-cov       # Coverage report
 ```
 
-## 🔧 Desarrollo
+## Desarrollo
 
 ### Estructura del Proyecto
 ```
@@ -212,7 +212,7 @@ NODE_ENV=development
 PORT=3000
 ```
 
-## 🤝 Contribuir
+## Contribuir
 
 1. Fork del repositorio
 2. Crear rama feature (`git checkout -b feature/nueva-funcionalidad`)
@@ -225,13 +225,13 @@ PORT=3000
 - **Commits**: Conventional Commits
 - **Testing**: Coverage mínimo 80%
 
-## 📞 Soporte
+## Soporte
 
 - **Issues**: [GitHub Issues](https://github.com/AKira-IV/Hikari/issues)
 - **Documentación**: Ver `/backend/README.md` para detalles técnicos
 - **API**: Swagger en http://localhost:3000/api cuando esté ejecutándose
 
-## 📄 Licencia
+## Licencia
 
 Hikari es un proyecto de código abierto bajo la licencia MIT.
    ```

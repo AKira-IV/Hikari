@@ -4,7 +4,7 @@ Backend del Sistema de Gestión Hospitalaria Hikari, desarrollado con NestJS, Ty
 
 ## Características Principales
 
-### ✅ Implementadas
+### Implementadas
 - **Sistema Multi-Tenant**: Cada hospital/clínica puede tener su propia instancia
 - **Autenticación JWT**: Sistema de autenticación seguro con roles de usuario
 - **Gestión de Usuarios**: CRUD completo con roles (Admin, Doctor, Nurse, Receptionist, Patient)

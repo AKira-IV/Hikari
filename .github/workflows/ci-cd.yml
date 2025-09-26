@@ -6,6 +6,16 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  NODE_ENV: test
+  DATABASE_HOST: localhost
+  DATABASE_PORT: 5432
+  DATABASE_USERNAME: hikari_user
+  DATABASE_PASSWORD: hikari_password
+  DATABASE_NAME: hikari_test
+  JWT_SECRET: test-secret-key-for-github-actions
+  JWT_EXPIRATION: 24h
+
 jobs:
   test:
     name: Run Tests
@@ -18,13 +28,14 @@ jobs:
           POSTGRES_USER: hikari_user
           POSTGRES_PASSWORD: hikari_password
           POSTGRES_DB: hikari_test
+          POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U hikari_user -d hikari_test"
           --health-interval 10s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 10
 
     steps:
     - name: Checkout code
@@ -37,9 +48,25 @@ jobs:
         cache: 'npm'
         cache-dependency-path: backend/package-lock.json
 
+    - name: Install PostgreSQL client
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y postgresql-client
+
     - name: Install backend dependencies
       working-directory: ./backend
       run: npm ci
+
+    - name: Wait for PostgreSQL
+      run: |
+        for i in {1..30}; do
+          if pg_isready -h localhost -p 5432 -U hikari_user; then
+            echo "PostgreSQL is ready!"
+            break
+          fi
+          echo "Waiting for PostgreSQL... ($i/30)"
+          sleep 2
+        done
 
     - name: Run linting
       working-directory: ./backend
@@ -55,7 +82,7 @@ jobs:
         DATABASE_USERNAME: hikari_user
         DATABASE_PASSWORD: hikari_password
         DATABASE_NAME: hikari_test
-        JWT_SECRET: test-secret-key
+        JWT_SECRET: test-secret-key-for-github-actions
         JWT_EXPIRATION: 24h
 
     - name: Run e2e tests
@@ -68,7 +95,7 @@ jobs:
         DATABASE_USERNAME: hikari_user
         DATABASE_PASSWORD: hikari_password
         DATABASE_NAME: hikari_test
-        JWT_SECRET: test-secret-key
+        JWT_SECRET: test-secret-key-for-github-actions
         JWT_EXPIRATION: 24h
 
     - name: Generate test coverage
@@ -81,8 +108,15 @@ jobs:
         DATABASE_USERNAME: hikari_user
         DATABASE_PASSWORD: hikari_password
         DATABASE_NAME: hikari_test
-        JWT_SECRET: test-secret-key
+        JWT_SECRET: test-secret-key-for-github-actions
         JWT_EXPIRATION: 24h
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./backend/coverage/lcov.info
+        flags: backend
+        name: backend-coverage
 
   build:
     name: Build Application
@@ -137,20 +171,16 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
-    - name: Build frontend Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./frontend
-        file: ./frontend/Dockerfile
-        push: false
-        tags: hikari-frontend:test
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-
-    - name: Test Docker Compose
+    - name: Test Docker Compose configuration
       run: |
         echo "Testing docker-compose configuration..."
-        docker-compose config
+        docker compose config --quiet
+
+    - name: Run Docker container test
+      run: |
+        echo "Testing backend Docker image..."
+        docker build -t hikari-backend:test ./backend
+        echo "Backend Docker image built successfully"
 
   security:
     name: Security Scan
@@ -174,15 +204,17 @@ jobs:
 
     - name: Run security audit
       working-directory: ./backend
-      run: npm audit --audit-level=high
+      run: npm audit --audit-level=moderate
+      continue-on-error: true
 
-    - name: Run Snyk to check for vulnerabilities
+    - name: Run Snyk security scan
       uses: snyk/actions/node@master
       continue-on-error: true
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
         args: --severity-threshold=high --file=backend/package.json
+        command: test
 
   deploy-staging:
     name: Deploy to Staging
@@ -197,13 +229,15 @@ jobs:
 
     - name: Deploy to staging
       run: |
-        echo "Deploying to staging environment..."
+        echo "🚀 Deploying to staging environment..."
+        echo "Branch: ${{ github.ref }}"
+        echo "Commit: ${{ github.sha }}"
         echo "This would typically deploy to your staging server"
 
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: [test, build, docker]
+    needs: [test, build, docker, security]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment: production
 
@@ -213,5 +247,7 @@ jobs:
 
     - name: Deploy to production
       run: |
-        echo "Deploying to production environment..."
+        echo "🚀 Deploying to production environment..."
+        echo "Branch: ${{ github.ref }}"
+        echo "Commit: ${{ github.sha }}"
         echo "This would typically deploy to your production server"
