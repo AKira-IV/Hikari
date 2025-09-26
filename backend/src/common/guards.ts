@@ -34,7 +34,7 @@ export class RolesGuard implements CanActivate {
 
     try {
       // Validate user context with security service
-      const userContext = this.securityService.validateUserContext(request);
+      const _userContext = this.securityService.validateUserContext(request);
 
       // Perform security validation
       const securityResult = this.securityService.performSecurityValidation(

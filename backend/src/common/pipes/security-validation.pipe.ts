@@ -3,6 +3,7 @@ import {
   PipeTransform,
   ArgumentMetadata,
   BadRequestException,
+  Type,
 } from '@nestjs/common';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
@@ -68,10 +69,44 @@ export class SecurityValidationPipe implements PipeTransform<any> {
 
     if (typeof value === 'string') {
       // Remove dangerous characters and normalize
-      return value
-        .trim()
-        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '') // Remove control characters
-        .substring(0, 10000); // Limit length to prevent DoS
+      // Using ranges to avoid control character regex warnings
+      const dangerousChars = [
+        '\u0000',
+        '\u0001',
+        '\u0002',
+        '\u0003',
+        '\u0004',
+        '\u0005',
+        '\u0006',
+        '\u0007',
+        '\u0008',
+        '\u000B',
+        '\u000C',
+        '\u000E',
+        '\u000F',
+        '\u0010',
+        '\u0011',
+        '\u0012',
+        '\u0013',
+        '\u0014',
+        '\u0015',
+        '\u0016',
+        '\u0017',
+        '\u0018',
+        '\u0019',
+        '\u001A',
+        '\u001B',
+        '\u001C',
+        '\u001D',
+        '\u001E',
+        '\u001F',
+        '\u007F',
+      ];
+      let cleanValue = value.trim();
+      for (const char of dangerousChars) {
+        cleanValue = cleanValue.replace(new RegExp(char, 'g'), '');
+      }
+      return cleanValue.substring(0, 10000); // Limit length to prevent DoS
     }
 
     if (Array.isArray(value)) {
@@ -101,8 +136,14 @@ export class SecurityValidationPipe implements PipeTransform<any> {
   /**
    * Determines if a metatype should be validated
    */
-  private toValidate(metatype: Function): boolean {
-    const types: Function[] = [String, Boolean, Number, Array, Object];
+  private toValidate(metatype: Type<any>): boolean {
+    const types: Type<any>[] = [
+      String,
+      Boolean,
+      Number,
+      Array,
+      Object,
+    ] as Type<any>[];
     return !types.includes(metatype);
   }
 
@@ -119,7 +160,9 @@ export class SecurityValidationPipe implements PipeTransform<any> {
         )) {
           // Check if this is a security-related constraint
           if (this.isSecurityConstraint(constraintKey)) {
-            securityErrors.push(`${error.property}: ${message}`);
+            securityErrors.push(
+              `${String(error.property)}: ${String(message)}`,
+            );
           }
         }
       }
@@ -146,7 +189,7 @@ export class SecurityValidationPipe implements PipeTransform<any> {
         )) {
           // Check if this is NOT a security-related constraint
           if (!this.isSecurityConstraint(constraintKey)) {
-            regularErrors.push(`${error.property}: ${message}`);
+            regularErrors.push(`${String(error.property)}: ${String(message)}`);
           }
         }
       }

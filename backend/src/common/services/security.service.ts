@@ -3,13 +3,12 @@ import {
   UnauthorizedException,
   ForbiddenException,
 } from '@nestjs/common';
-import { User } from '../../database/entities/user.entity';
-import { Tenant } from '../../database/entities/tenant.entity';
 import {
   SecureRequest,
   ValidatedUserContext,
   SecurityValidationResult,
 } from '../interfaces/security.interface';
+import { AuthenticatedRequest } from '../interfaces/http-request.interface';
 
 /**
  * Security Service for OWASP compliance and tenant isolation
@@ -25,12 +24,12 @@ export class SecurityService {
    * Validates and sanitizes user context from request
    * Prevents tenant isolation bypass (OWASP A01)
    */
-  validateUserContext(request: any): ValidatedUserContext {
+  validateUserContext(request: AuthenticatedRequest): ValidatedUserContext {
     if (!request?.user) {
       throw new UnauthorizedException('No authenticated user found');
     }
 
-    const user = request.user as User;
+    const user = request.user;
 
     // Validate required security fields
     if (!user.id || !user.tenantId || !user.role) {
@@ -163,7 +162,7 @@ export class SecurityService {
   /**
    * Basic rate limiting check
    */
-  private isRateLimited(ip: string, operation: string): boolean {
+  private isRateLimited(_ip: string, _operation: string): boolean {
     // This should be implemented with Redis or similar
     // For now, just a placeholder
     return false;

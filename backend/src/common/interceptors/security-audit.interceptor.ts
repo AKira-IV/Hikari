@@ -111,7 +111,7 @@ export class SecurityAuditInterceptor implements NestInterceptor {
     const dataStr = JSON.stringify(data);
 
     // Check for tenant IDs that don't match the user's tenant
-    const tenantIdMatches = dataStr.match(/[0-9a-f-]{36}/g) || []; // UUID pattern
+    const tenantIdMatches: string[] = dataStr.match(/[0-9a-f-]{36}/g) || []; // UUID pattern
 
     for (const match of tenantIdMatches) {
       if (match !== userTenantId && this.looksLikeTenantId(match)) {
@@ -158,8 +158,10 @@ export class SecurityAuditInterceptor implements NestInterceptor {
       'validation',
     ];
 
-    const message = (error.message || '').toLowerCase();
-    return securityKeywords.some((keyword) => message.includes(keyword));
+    const message = String(error?.message || '').toLowerCase();
+    return securityKeywords.some((keyword) =>
+      String(message).includes(keyword),
+    );
   }
 
   /**

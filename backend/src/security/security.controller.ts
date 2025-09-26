@@ -30,7 +30,7 @@ export class SecurityController {
   @Roles(UserRole.ADMIN)
   @UseGuards(RolesGuard)
   @Get('metrics')
-  async getSecurityMetrics(
+  getSecurityMetrics(
     @CurrentUser() user: User,
     @CurrentTenant() tenant: Tenant,
     @Query('days') days = 7,
@@ -85,7 +85,7 @@ export class SecurityController {
   @Roles(UserRole.ADMIN)
   @UseGuards(RolesGuard)
   @Get('audit')
-  async getSecurityAuditTrail(
+  getSecurityAuditTrail(
     @CurrentUser() user: User,
     @CurrentTenant() tenant: Tenant,
     @Query('limit') limit = 100,
@@ -134,7 +134,7 @@ export class SecurityController {
   @Roles(UserRole.ADMIN)
   @UseGuards(RolesGuard)
   @Get('owasp-report')
-  async getOWASPComplianceReport(
+  getOWASPComplianceReport(
     @CurrentUser() user: User,
     @CurrentTenant() tenant: Tenant,
   ) {
@@ -221,7 +221,7 @@ export class SecurityController {
   @ApiOperation({ summary: 'Run security health check' })
   @ApiResponse({ status: 200, description: 'Security health check completed' })
   @Get('health')
-  async securityHealthCheck() {
+  securityHealthCheck() {
     // Basic security health checks
     const checks = {
       rateLimiting: true,

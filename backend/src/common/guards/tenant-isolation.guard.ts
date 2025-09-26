@@ -5,7 +5,6 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { SecurityService } from '../services/security.service';
-import { User } from '../../database/entities/user.entity';
 
 /**
  * Tenant Isolation Guard

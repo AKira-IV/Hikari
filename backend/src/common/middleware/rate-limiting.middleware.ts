@@ -6,6 +6,16 @@ import {
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 
+interface RateLimit {
+  maxRequests: number;
+  windowMs: number;
+}
+
+interface ClientData {
+  count: number;
+  resetTime: number;
+}
+
 /**
  * Rate Limiting Middleware
  * Addresses OWASP A07:2021 - Identification and Authentication Failures
@@ -13,13 +23,10 @@ import { Request, Response, NextFunction } from 'express';
  */
 @Injectable()
 export class RateLimitingMiddleware implements NestMiddleware {
-  private requestCounts = new Map<
-    string,
-    { count: number; resetTime: number }
-  >();
+  private requestCounts = new Map<string, ClientData>();
 
   // Rate limiting rules by endpoint pattern
-  private rateLimits = {
+  private rateLimits: Record<string, RateLimit> = {
     '/auth/login': { maxRequests: 5, windowMs: 15 * 60 * 1000 }, // 5 requests per 15 minutes
     '/auth/register': { maxRequests: 3, windowMs: 60 * 60 * 1000 }, // 3 requests per hour
     '/auth/tenant': { maxRequests: 2, windowMs: 60 * 60 * 1000 }, // 2 requests per hour
