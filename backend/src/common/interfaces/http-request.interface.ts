@@ -5,17 +5,23 @@ import { Tenant } from '../../database/entities/tenant.entity';
  * Extended Request interface with typed user context
  * Reduces TypeScript unsafe access warnings
  */
-export interface AuthenticatedRequest extends Request {
-  user: {
+export interface AuthenticatedUser {
+  id: string;
+  tenantId: string;
+  role: string;
+  isActive: boolean;
+  tenant: Tenant & {
     id: string;
-    tenantId: string;
-    role: string;
     isActive: boolean;
-    tenant: Tenant & {
-      id: string;
-      isActive: boolean;
-    };
   };
+}
+
+/**
+ * Extended Request interface with typed user context
+ * Reduces TypeScript unsafe access warnings
+ */
+export interface AuthenticatedRequest extends Request {
+  user: AuthenticatedUser;
 }
 
 /**

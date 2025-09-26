@@ -1,14 +1,16 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { User } from '../database/entities/user.entity';
 import { Tenant } from '../database/entities/tenant.entity';
-import { AuthenticatedRequest } from './interfaces/http-request.interface';
+import {
+  AuthenticatedRequest,
+  AuthenticatedUser,
+} from './interfaces/http-request.interface';
 
 /**
  * Secure CurrentUser decorator with tenant isolation validation
  * Addresses OWASP A01:2021 - Broken Access Control
  */
 export const CurrentUser = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext): User => {
+  (data: unknown, ctx: ExecutionContext): AuthenticatedUser => {
     const request = ctx.switchToHttp().getRequest<AuthenticatedRequest>();
 
     // Basic validation before type assertion
@@ -16,7 +18,7 @@ export const CurrentUser = createParamDecorator(
       throw new Error('Invalid user context in request');
     }
 
-    const user = request.user;
+    const user: AuthenticatedUser = request.user;
 
     // Additional security validation
     if (!user.isActive || !user.tenant?.isActive) {
