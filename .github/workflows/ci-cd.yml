@@ -46,7 +46,9 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
-        cache-dependency-path: backend/package-lock.json
+        cache-dependency-path: |
+          backend/package-lock.json
+          frontend/package-lock.json
 
     - name: Install PostgreSQL client
       run: |
@@ -132,7 +134,9 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
-        cache-dependency-path: backend/package-lock.json
+        cache-dependency-path: |
+          backend/package-lock.json
+          frontend/package-lock.json
 
     - name: Install backend dependencies
       working-directory: ./backend
@@ -142,11 +146,34 @@ jobs:
       working-directory: ./backend
       run: npm run build
 
-    - name: Upload build artifacts
+    - name: Install frontend dependencies
+      working-directory: ./frontend
+      run: npm ci
+
+    - name: Lint frontend
+      working-directory: ./frontend
+      run: npm run lint
+
+    - name: Type-check frontend
+      working-directory: ./frontend
+      run: npm run type-check
+
+    - name: Build frontend
+      working-directory: ./frontend
+      run: npm run build
+
+    - name: Upload backend build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: backend-dist
         path: backend/dist
+        retention-days: 7
+
+    - name: Upload frontend build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-next-artifacts
+        path: frontend/.next
         retention-days: 7
 
   docker:
@@ -168,6 +195,16 @@ jobs:
         file: ./backend/Dockerfile
         push: false
         tags: hikari-backend:test
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build frontend Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./frontend
+        file: ./frontend/Dockerfile
+        push: false
+        tags: hikari-frontend:test
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
@@ -196,7 +233,9 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
-        cache-dependency-path: backend/package-lock.json
+        cache-dependency-path: |
+          backend/package-lock.json
+          frontend/package-lock.json
 
     - name: Install dependencies
       working-directory: ./backend
@@ -229,7 +268,7 @@ jobs:
 
     - name: Deploy to staging
       run: |
-        echo "🚀 Deploying to staging environment..."
+        echo "Deploying to staging environment..."
         echo "Branch: ${{ github.ref }}"
         echo "Commit: ${{ github.sha }}"
         echo "This would typically deploy to your staging server"
@@ -247,7 +286,7 @@ jobs:
 
     - name: Deploy to production
       run: |
-        echo "🚀 Deploying to production environment..."
+        echo "Deploying to production environment..."
         echo "Branch: ${{ github.ref }}"
         echo "Commit: ${{ github.sha }}"
         echo "This would typically deploy to your production server"

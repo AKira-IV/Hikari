@@ -44,8 +44,14 @@ describe('UsersController', () => {
       providers: [
         { provide: UsersService, useValue: usersServiceMock },
         { provide: SecurityService, useValue: securityServiceMock },
-        { provide: RolesGuard, useValue: { canActivate: jest.fn().mockReturnValue(true) } },
-        { provide: JwtAuthGuard, useValue: { canActivate: jest.fn().mockReturnValue(true) } },
+        {
+          provide: RolesGuard,
+          useValue: { canActivate: jest.fn().mockReturnValue(true) },
+        },
+        {
+          provide: JwtAuthGuard,
+          useValue: { canActivate: jest.fn().mockReturnValue(true) },
+        },
       ],
     }).compile();
 

@@ -1,20 +1,25 @@
-# Usa una imagen base de Node.js
-FROM node:16
+﻿FROM node:18-alpine AS deps
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
 
-# Crear y acceder al directorio de trabajo
-WORKDIR /usr/src/app
-
-# Copiar el package.json y package-lock.json
-COPY package*.json ./
-
-# Instalar dependencias
-RUN npm install
-
-# Copiar todo el código fuente
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+RUN npm run build
 
-# Exponer el puerto en el que se ejecuta la app
-EXPOSE 3001
+FROM node:18-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+ENV PORT=3000
 
-# Comando para iniciar la aplicación
-CMD ["npm", "start"]
+# Para la imagen standalone de Next.js
+COPY --from=builder /app/next.config.mjs ./next.config.mjs
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+
+EXPOSE 3000
+
+CMD ["node", "server.js"]

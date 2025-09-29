@@ -1,9 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
+﻿import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../database/entities/user.entity';
 import { Tenant } from '../database/entities/tenant.entity';
+import { CaptchaService } from '../common/services/captcha.service';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -19,6 +20,10 @@ describe('AuthService', () => {
     findOne: jest.fn(),
     create: jest.fn(),
     save: jest.fn(),
+  };
+
+  const mockCaptchaService = {
+    verify: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -38,6 +43,10 @@ describe('AuthService', () => {
         {
           provide: getRepositoryToken(Tenant),
           useValue: mockTenantRepository,
+        },
+        {
+          provide: CaptchaService,
+          useValue: mockCaptchaService,
         },
       ],
     }).compile();

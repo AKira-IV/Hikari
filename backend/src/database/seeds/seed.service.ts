@@ -45,7 +45,7 @@ export class SeedService {
     if (!existingAdmin) {
       const adminUser = this.userRepository.create({
         email: 'admin@demo.com',
-        password: await bcrypt.hash('admin123', 10),
+        password: 'admin123',
         firstName: 'Admin',
         lastName: 'Demo',
         role: UserRole.ADMIN,
@@ -66,7 +66,7 @@ export class SeedService {
     if (!existingDoctor) {
       const doctorUser = this.userRepository.create({
         email: 'doctor@demo.com',
-        password: await bcrypt.hash('doctor123', 10),
+        password: 'doctor123',
         firstName: 'Dr. Juan',
         lastName: 'Pérez',
         role: UserRole.DOCTOR,
@@ -88,7 +88,7 @@ export class SeedService {
     if (!existingNurse) {
       const nurseUser = this.userRepository.create({
         email: 'nurse@demo.com',
-        password: await bcrypt.hash('nurse123', 10),
+        password: 'nurse123',
         firstName: 'María',
         lastName: 'González',
         role: UserRole.NURSE,

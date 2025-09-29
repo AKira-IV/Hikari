@@ -1,0 +1,42 @@
+# Configuración de deployment por contexto
+
+# 🏥 HOSPITAL PEQUEÑO (< 50 camas)
+version: '3.8'
+services:
+  hikari-essential:
+    image: hikari/core:latest
+    environment:
+      - MODULES=core,basic-reporting
+      - DEPLOYMENT_TYPE=small_hospital
+      - OFFLINE_MODE=true
+      - BACKUP_STRATEGY=local
+    resources:
+      limits:
+        memory: 512M
+        cpus: 0.5
+
+# 🏛️ HOSPITAL PROVINCIAL (> 200 camas)
+version: '3.8'
+services:
+  hikari-full:
+    image: hikari/core:latest
+    environment:
+      - MODULES=core,billing,analytics,telemedicine,laboratory
+      - DEPLOYMENT_TYPE=large_hospital
+      - GOVERNMENT_INTEGRATION=enabled
+      - BACKUP_STRATEGY=distributed
+    resources:
+      limits:
+        memory: 2G
+        cpus: 2
+
+# 🌐 CLUSTER GUBERNAMENTAL (Multi-hospital)
+version: '3.8'
+services:
+  hikari-orchestrator:
+    image: hikari/orchestrator:latest
+    environment:
+      - DEPLOYMENT_TYPE=government_cluster
+      - TENANT_ISOLATION=strict
+      - COMPLIANCE_MODE=argentina_health
+      - INTEGRATION_APIS=anmat,sumar,provincial_health

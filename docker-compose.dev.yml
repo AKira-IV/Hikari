@@ -1,4 +1,4 @@
-version: '3.8'
+﻿version: '3.8'
 
 services:
   backend-dev:
@@ -15,8 +15,12 @@ services:
       - DATABASE_PASSWORD=hikari_password
       - DATABASE_NAME=hikari
       - JWT_SECRET=dev-super-secret-jwt-key
-      - JWT_EXPIRATION=24h
+      - JWT_EXPIRATION=15m
+      - REFRESH_TOKEN_EXPIRATION_DAYS=7
       - PORT=3000
+      - RECAPTCHA_ENABLED=false
+      - RECAPTCHA_SECRET=
+      - RECAPTCHA_MIN_SCORE=0.5
     depends_on:
       db-dev:
         condition: service_healthy
@@ -57,3 +61,4 @@ services:
 
 volumes:
   postgres_dev_data:
+

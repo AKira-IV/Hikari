@@ -1,26 +1,26 @@
-# Hikari Backend API
+﻿# Hikari Backend API
 
-Backend del Sistema de Gestión Hospitalaria Hikari, desarrollado con NestJS, TypeORM y PostgreSQL.
+Backend del Sistema de GestiÃ³n Hospitalaria Hikari, desarrollado con NestJS, TypeORM y PostgreSQL.
 
-## Características Principales
+## CaracterÃ­sticas Principales
 
 ### Implementadas
-- **Sistema Multi-Tenant**: Cada hospital/clínica puede tener su propia instancia
-- **Autenticación JWT**: Sistema de autenticación seguro con roles de usuario
-- **Gestión de Usuarios**: CRUD completo con roles (Admin, Doctor, Nurse, Receptionist, Patient)
-- **Documentación API**: Swagger automático disponible en `/api`
-- **Validación de Datos**: Validación automática con class-validator
+- **Sistema Multi-Tenant**: Cada hospital/clÃ­nica puede tener su propia instancia
+- **AutenticaciÃ³n JWT**: Sistema de autenticaciÃ³n seguro con roles de usuario
+- **GestiÃ³n de Usuarios**: CRUD completo con roles (Admin, Doctor, Nurse, Receptionist, Patient)
+- **DocumentaciÃ³n API**: Swagger automÃ¡tico disponible en `/api`
+- **ValidaciÃ³n de Datos**: ValidaciÃ³n automÃ¡tica con class-validator
 - **Base de Datos**: PostgreSQL con TypeORM
 - **Seeds**: Datos de prueba automatizados
 
 ### Roles de Usuario
 - **ADMIN**: Administrador completo del tenant
-- **DOCTOR**: Profesional médico
-- **NURSE**: Personal de enfermería
-- **RECEPTIONIST**: Personal de recepción
+- **DOCTOR**: Profesional mÃ©dico
+- **NURSE**: Personal de enfermerÃ­a
+- **RECEPTIONIST**: Personal de recepciÃ³n
 - **PATIENT**: Paciente
 
-## Configuración e Instalación
+## ConfiguraciÃ³n e InstalaciÃ³n
 
 ### Prerrequisitos
 - Node.js 16+
@@ -50,6 +50,11 @@ JWT_EXPIRATION=24h
 # Application Configuration
 NODE_ENV=development
 PORT=3000
+
+# Captcha Configuration
+RECAPTCHA_ENABLED=false
+RECAPTCHA_SECRET=your-recaptcha-secret
+RECAPTCHA_MIN_SCORE=0.5
 ```
 
 ### 3. Configurar Base de Datos
@@ -61,15 +66,15 @@ createdb hikari
 # CREATE DATABASE hikari;
 ```
 
-### 4. Ejecutar Migraciones (Automático)
-El sistema usa `synchronize: true` en desarrollo, por lo que las tablas se crean automáticamente.
+### 4. Ejecutar Migraciones (AutomÃ¡tico)
+El sistema usa `synchronize: true` en desarrollo, por lo que las tablas se crean automÃ¡ticamente.
 
 ### 5. Cargar Datos de Prueba
 ```bash
 npm run seed
 ```
 
-Esto creará:
+Esto crearÃ¡:
 - Tenant "demo" con subdomain "demo"
 - Usuario Admin: `admin@demo.com` / `admin123`
 - Usuario Doctor: `doctor@demo.com` / `doctor123`
@@ -80,7 +85,7 @@ Esto creará:
 # Desarrollo
 npm run start:dev
 
-# Producción
+# ProducciÃ³n
 npm run start:prod
 ```
 
@@ -91,14 +96,14 @@ npm run start:prod
 http://localhost:3000
 ```
 
-### Documentación Swagger
+### DocumentaciÃ³n Swagger
 ```
 http://localhost:3000/api
 ```
 
 ### Endpoints Principales
 
-#### Autenticación
+#### AutenticaciÃ³n
 
 **Crear Nuevo Tenant**
 ```bash
@@ -124,7 +129,8 @@ Content-Type: application/json
 {
   "email": "admin@demo.com",
   "password": "admin123",
-  "tenantSubdomain": "demo"
+  "tenantSubdomain": "demo",
+  "captchaToken": "<client-captcha-token>"
 }
 ```
 
@@ -133,10 +139,12 @@ Content-Type: application/json
 ```bash
 npm run build          # Compilar
 npm run start:dev      # Desarrollo con hot-reload
-npm run start:prod     # Producción
+npm run start:prod     # ProducciÃ³n
 npm run seed           # Cargar datos de prueba
 npm run test           # Ejecutar tests
-npm run lint           # Revisar código
+npm run lint           # Revisar cÃ³digo
 ```
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+

@@ -1,43 +1,56 @@
-// @ts-check
-import eslint from '@eslint/js';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
-import globals from 'globals';
-import tseslint from 'typescript-eslint';
+import typescriptEslint from "@typescript-eslint/eslint-plugin";
+import prettier from "eslint-plugin-prettier";
+import typescriptParser from "@typescript-eslint/parser";
 
-export default tseslint.config(
+export default [
   {
-    ignores: ['eslint.config.mjs'],
-  },
-  eslint.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked,
-  eslintPluginPrettierRecommended,
-  {
+    files: ["**/*.ts"],
+    ignores: ["dist/**/*", "node_modules/**/*"],
     languageOptions: {
-      globals: {
-        ...globals.node,
-        ...globals.jest,
-      },
-      ecmaVersion: 5,
-      sourceType: 'module',
+      parser: typescriptParser,
       parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
+        project: "./tsconfig.json",
+        tsconfigRootDir: process.cwd(),
       },
+    },
+    plugins: {
+      "@typescript-eslint": typescriptEslint,
+      prettier: prettier,
+    },
+    rules: {
+      // Prettier integration
+      "prettier/prettier": "error",
+
+      // TypeScript strict rules
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "@typescript-eslint/no-inferrable-types": "off",
+
+      // Security-specific: More permissive for HTTP handling
+      "@typescript-eslint/no-unsafe-assignment": "off", // Common in HTTP middleware
+      "@typescript-eslint/no-unsafe-member-access": "off", // Common in request objects
+      "@typescript-eslint/no-unsafe-argument": "warn", // Keep as warning
+      "@typescript-eslint/no-unsafe-return": "warn", // Keep as warning
+      "@typescript-eslint/no-unsafe-call": "error", // Keep strict
+
+      // Reduce redundant rules
+      "@typescript-eslint/no-redundant-type-constituents": "off",
+      "@typescript-eslint/require-await": "off", // Allow async without await
     },
   },
   {
+    // Special rules for security modules
+    files: ["src/common/**/*.ts", "src/security/**/*.ts"],
     rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'warn',
-      '@typescript-eslint/no-unsafe-assignment': 'warn',
-      '@typescript-eslint/no-unsafe-member-access': 'warn',
-      '@typescript-eslint/no-unsafe-return': 'warn',
-      '@typescript-eslint/no-unused-vars': ['error', {
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_',
-        destructuredArrayIgnorePattern: '^_'
-      }]
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
     },
   },
-);
+];

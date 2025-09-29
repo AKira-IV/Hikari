@@ -20,7 +20,9 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
-        cache-dependency-path: backend/package-lock.json
+        cache-dependency-path: |
+          backend/package-lock.json
+          frontend/package-lock.json
 
     - name: Install dependencies
       working-directory: ./backend
@@ -29,6 +31,18 @@ jobs:
     - name: Run linting
       working-directory: ./backend
       run: npm run lint
+
+    - name: Install frontend dependencies
+      working-directory: ./frontend
+      run: npm ci
+
+    - name: Lint frontend
+      working-directory: ./frontend
+      run: npm run lint
+
+    - name: Type-check frontend
+      working-directory: ./frontend
+      run: npm run type-check
 
     - name: Build application
       working-directory: ./backend

@@ -1,6 +1,6 @@
 # GitHub Actions CI/CD para Hikari
 
-## 🔄 Workflows Configurados
+## Workflows Configurados
 
 ### 1. Quick Test (`quick-test.yml`)
 - **Trigger**: Push/PR a branch `dev`
@@ -23,7 +23,7 @@
 - **Trigger**: Push a `main`/`develop`, tags
 - **Propósito**: Build y push de imágenes Docker a GitHub Container Registry
 
-## 🛠️ Solución de Problemas Comunes
+## Solución de Problemas Comunes
 
 ### Error: `pg_isready` no encontrado
 **Solución**: Se agregó instalación de PostgreSQL client
@@ -68,9 +68,9 @@ services:
   continue-on-error: true
 ```
 
-## 🚀 Estado Actual
+## Estado Actual
 
-### ✅ Funcional
+### Funcional
 - Linting automático
 - Build de TypeScript
 - Tests unitarios básicos
@@ -78,13 +78,13 @@ services:
 - Variables de entorno configuradas
 - PostgreSQL service
 
-### 🔧 En desarrollo
+### En desarrollo
 - Tests E2E completos con base de datos
 - Deploy real a staging/production
 - Notificaciones de Slack/Discord
 - Cache optimizado
 
-## 📋 Variables de Entorno Requeridas
+## Variables de Entorno Requeridas
 
 ### Automáticas (GitHub)
 - `GITHUB_TOKEN`: Token automático para registry
@@ -94,13 +94,13 @@ services:
 - `SNYK_TOKEN`: Para análisis de seguridad con Snyk
 - `SLACK_WEBHOOK`: Para notificaciones (futuro)
 
-## 🔍 Verificar Estado
+## Verificar Estado
 
 1. **Ver Actions**: https://github.com/AKira-IV/Hikari/actions
 2. **Logs**: Click en cualquier workflow run
 3. **Build status**: Badge en README
 
-## 🎯 Próximos Pasos
+## Próximos Pasos
 
 1. **Agregar badge de status** al README principal
 2. **Configurar environments** en GitHub para staging/production
@@ -108,7 +108,7 @@ services:
 4. **Notificaciones** de estado de builds
 5. **Cache optimizado** para dependencias
 
-## 💡 Tips de Desarrollo
+## Tips de Desarrollo
 
 ### Para testear workflows localmente:
 ```bash

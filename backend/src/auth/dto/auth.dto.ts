@@ -1,4 +1,4 @@
-import {
+﻿import {
   IsEmail,
   IsNotEmpty,
   MinLength,
@@ -6,6 +6,7 @@ import {
   IsEnum,
   IsAlphanumeric,
   MaxLength,
+  IsString,
 } from 'class-validator';
 import { UserRole } from '../../database/entities/user.entity';
 import {
@@ -31,6 +32,12 @@ export class LoginDto {
   @IsNotXSS()
   @IsNotSQLInjection()
   tenantSubdomain: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(1000)
+  @IsSecureInput()
+  captchaToken?: string;
 }
 
 export class RegisterDto {
@@ -77,6 +84,12 @@ export class RegisterDto {
   @IsNotXSS()
   @IsNotSQLInjection()
   tenantSubdomain: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(1000)
+  @IsSecureInput()
+  captchaToken: string;
 }
 
 export class CreateTenantDto {
@@ -104,4 +117,10 @@ export class CreateTenantDto {
 
   @IsNotEmpty()
   adminLastName: string;
+}
+
+export class RefreshTokenDto {
+  @IsNotEmpty()
+  @IsString()
+  refreshToken: string;
 }

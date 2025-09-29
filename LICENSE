@@ -1,0 +1,45 @@
+MIT License
+
+Copyright (c) 2025 Hikari - Sistema de Gestión Hospitalaria Gratuito
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## Misión Social
+
+Este software está dedicado a mejorar el acceso a la atención médica en países
+en desarrollo y centros de salud con recursos limitados. Es completamente
+gratuito y de código abierto.
+
+### Dedicado especialmente a:
+- Hospitales públicos en Argentina y Latinoamérica
+- Centros de salud rurales y urbanos marginales
+- Clínicas comunitarias sin fines de lucro
+- Organizaciones médicas humanitarias
+- Cualquier institución de salud que busque digitalizar sus procesos
+
+### Valores fundamentales:
+- **Acceso universal**: La tecnología médica debe ser accesible para todos
+- **Transparencia**: Código abierto para auditabilía y confianza
+- **Colaboración**: Desarrollado por y para la comunidad médica
+- **Sostenibilidad**: Solución a largo plazo sin costos de licencia
+- **Seguridad**: Cumplimiento con estándares internacionales (OWASP)
+
+¡Contribuciones bienvenidas para mejorar la salud mundial!

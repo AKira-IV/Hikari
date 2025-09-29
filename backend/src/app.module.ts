@@ -10,6 +10,7 @@ import { ProfessionalsModule } from './professionals/professionals.module';
 import { UsersModule } from './users/users.module';
 import { User } from './database/entities/user.entity';
 import { Tenant } from './database/entities/tenant.entity';
+import { RefreshToken } from './database/entities/refresh-token.entity';
 import { SeedService } from './database/seeds/seed.service';
 import { CommonSecurityModule } from './common/common-security.module';
 
@@ -26,7 +27,7 @@ import { CommonSecurityModule } from './common/common-security.module';
       username: process.env.DATABASE_USERNAME || 'postgres',
       password: process.env.DATABASE_PASSWORD || 'password',
       database: process.env.DATABASE_NAME || 'hikari',
-      entities: [User, Tenant],
+      entities: [User, Tenant, RefreshToken],
       autoLoadEntities: true,
       synchronize: process.env.NODE_ENV !== 'production',
     }),

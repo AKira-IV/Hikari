@@ -1,4 +1,4 @@
-# Hikari Makefile
+﻿# Hikari Makefile
 .PHONY: help build up down logs clean test seed
 
 # Default target
@@ -64,6 +64,9 @@ clean: ## Clean up containers and volumes
 install: ## Install dependencies
 	cd backend && npm install
 	cd frontend && npm install
+
+frontend-dev: ## Run Next.js dev server
+	cd frontend && npm run dev -- --port 3001
 
 lint: ## Run linting
 	cd backend && npm run lint

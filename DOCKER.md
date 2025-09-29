@@ -50,7 +50,7 @@ docker compose -f docker-compose.dev.yml exec backend-dev npm run seed
 - **Adminer (DB Admin)**: http://localhost:8080
 - **Health Check**: http://localhost:3000/health
 
-## 🔧 Comandos Útiles
+## Comandos Útiles
 
 ### Desarrollo
 ```bash

@@ -1,4 +1,4 @@
-version: '3.8'
+﻿version: '3.8'
 
 services:
   backend:
@@ -17,6 +17,9 @@ services:
       - JWT_SECRET=production-super-secret-jwt-key-change-in-production
       - JWT_EXPIRATION=24h
       - PORT=3000
+      - RECAPTCHA_ENABLED=${RECAPTCHA_ENABLED:-false}
+      - RECAPTCHA_SECRET=${RECAPTCHA_SECRET:-}
+      - RECAPTCHA_MIN_SCORE=${RECAPTCHA_MIN_SCORE:-0.5}
     depends_on:
       db:
         condition: service_healthy
@@ -33,7 +36,9 @@ services:
     depends_on:
       - backend
     environment:
-      - REACT_APP_API_URL=http://localhost:3000
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_BASE_URL=http://backend:3000
+      - NEXT_PUBLIC_RECAPTCHA_SITE_KEY=${NEXT_PUBLIC_RECAPTCHA_SITE_KEY:-}
 
   db:
     image: postgres:15-alpine

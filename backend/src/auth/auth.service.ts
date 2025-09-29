@@ -1,4 +1,4 @@
-import {
+﻿import {
   Injectable,
   UnauthorizedException,
   ConflictException,
@@ -9,7 +9,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, UserRole } from '../database/entities/user.entity';
 import { Tenant } from '../database/entities/tenant.entity';
-import { LoginDto, RegisterDto, CreateTenantDto } from './dto/auth.dto';
+import { LoginDto, RegisterDto, CreateTenantDto, RefreshTokenDto } from './dto/auth.dto';
+import { CaptchaService } from '../common/services/captcha.service';
+import { RefreshTokenService } from './refresh-token.service';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +21,8 @@ export class AuthService {
     @InjectRepository(Tenant)
     private tenantRepository: Repository<Tenant>,
     private jwtService: JwtService,
+    private captchaService: CaptchaService,
+    private refreshTokenService: RefreshTokenService,
   ) {}
 
   async validateUser(
@@ -52,7 +56,7 @@ export class AuthService {
     });
   }
 
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto, ipAddress?: string, userAgent?: string) {
     const user = await this.validateUser(
       loginDto.email,
       loginDto.password,
@@ -70,8 +74,19 @@ export class AuthService {
       tenantSubdomain: user.tenant.subdomain,
     };
 
+    // Generar access token (corta duración)
+    const accessToken = this.jwtService.sign(payload);
+
+    // Generar refresh token (larga duración)
+    const refreshToken = await this.refreshTokenService.generateRefreshToken(
+      user,
+      ipAddress,
+      userAgent,
+    );
+
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: accessToken,
+      refresh_token: refreshToken.token,
       user: {
         id: user.id,
         email: user.email,
@@ -87,7 +102,59 @@ export class AuthService {
     };
   }
 
+  async refreshToken(refreshTokenDto: RefreshTokenDto, ipAddress?: string, userAgent?: string) {
+    // Validar refresh token y obtener usuario
+    const user = await this.refreshTokenService.validateRefreshToken(
+      refreshTokenDto.refreshToken,
+    );
+
+    // Rotar el refresh token por seguridad
+    const newRefreshToken = await this.refreshTokenService.rotateRefreshToken(
+      refreshTokenDto.refreshToken,
+      ipAddress,
+      userAgent,
+    );
+
+    // Generar nuevo access token
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      role: user.role,
+      tenantId: user.tenantId,
+      tenantSubdomain: user.tenant.subdomain,
+    };
+
+    const accessToken = this.jwtService.sign(payload);
+
+    return {
+      access_token: accessToken,
+      refresh_token: newRefreshToken.token,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        tenant: {
+          id: user.tenant.id,
+          name: user.tenant.name,
+          subdomain: user.tenant.subdomain,
+        },
+      },
+    };
+  }
+
+  async logout(refreshToken: string): Promise<void> {
+    await this.refreshTokenService.revokeRefreshToken(refreshToken);
+  }
+
+  async logoutAllSessions(userId: string): Promise<void> {
+    await this.refreshTokenService.revokeAllUserTokens(userId);
+  }
+
   async register(registerDto: RegisterDto) {
+    await this.captchaService.verify(registerDto.captchaToken);
+
     const tenant = await this.tenantRepository.findOne({
       where: { subdomain: registerDto.tenantSubdomain, isActive: true },
     });
@@ -116,8 +183,6 @@ export class AuthService {
     });
 
     const savedUser = await this.userRepository.save(user);
-
-    // Remove password from response
 
     const { password: _, ...userWithoutPassword } = savedUser;
     return userWithoutPassword;
