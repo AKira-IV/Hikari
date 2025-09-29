@@ -47,7 +47,6 @@ export class RegisterDto {
   email: string;
 
   @IsNotEmpty()
-  @MinLength(8)
   @IsStrongPassword()
   password: string;
 
