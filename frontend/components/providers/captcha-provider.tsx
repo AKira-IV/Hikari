@@ -7,26 +7,28 @@ interface CaptchaProviderProps {
   children: ReactNode;
 }
 
-const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+// Use Google reCAPTCHA test key in non-production if site key is not set
+const TEST_RECAPTCHA_SITE_KEY = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI';
+const siteKey =
+  process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ||
+  (process.env.NODE_ENV !== 'production' ? TEST_RECAPTCHA_SITE_KEY : '');
 
 export function CaptchaProvider({ children }: CaptchaProviderProps) {
   const isEnabled = Boolean(siteKey);
 
   const providerProps = useMemo(
     () => ({
-      reCaptchaKey: siteKey ?? '',
+      reCaptchaKey: siteKey,
       scriptProps: {
         async: true,
         defer: true,
       },
     }),
-    [],
+    [siteKey],
   );
 
   if (!isEnabled) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn('reCAPTCHA site key not configured; captcha is disabled on the client.');
-    }
+    console.warn('reCAPTCHA site key not configured; captcha is disabled on the client.');
     return <>{children}</>;
   }
 
