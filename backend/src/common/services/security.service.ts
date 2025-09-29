@@ -162,9 +162,32 @@ export class SecurityService {
   /**
    * Basic rate limiting check
    */
-  private isRateLimited(_ip: string, _operation: string): boolean {
-    // This should be implemented with Redis or similar
-    // For now, just a placeholder
+  // In-memory rate limit store: { [ip_operation]: { count, timestamp } }
+  private rateLimitStore: Record<string, { count: number; timestamp: number }> = {};
+
+  private isRateLimited(ip: string, operation: string): boolean {
+    const RATE_LIMIT = 100; // max requests per window
+    const WINDOW_MS = 60 * 1000; // 1 minute window
+    const key = `${ip}_${operation}`;
+    const now = Date.now();
+
+    if (!this.rateLimitStore[key]) {
+      this.rateLimitStore[key] = { count: 1, timestamp: now };
+      return false;
+    }
+
+    const entry = this.rateLimitStore[key];
+    if (now - entry.timestamp > WINDOW_MS) {
+      // Reset window
+      entry.count = 1;
+      entry.timestamp = now;
+      return false;
+    }
+
+    entry.count += 1;
+    if (entry.count > RATE_LIMIT) {
+      return true;
+    }
     return false;
   }
 
