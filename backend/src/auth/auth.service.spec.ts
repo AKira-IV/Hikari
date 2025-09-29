@@ -5,6 +5,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../database/entities/user.entity';
 import { Tenant } from '../database/entities/tenant.entity';
 import { CaptchaService } from '../common/services/captcha.service';
+import { RefreshTokenService } from './refresh-token.service';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -24,6 +25,14 @@ describe('AuthService', () => {
 
   const mockCaptchaService = {
     verify: jest.fn(),
+  };
+
+  const mockRefreshTokenService = {
+    generateRefreshToken: jest.fn(),
+    validateRefreshToken: jest.fn(),
+    rotateRefreshToken: jest.fn(),
+    revokeRefreshToken: jest.fn(),
+    revokeAllUserTokens: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -47,6 +56,10 @@ describe('AuthService', () => {
         {
           provide: CaptchaService,
           useValue: mockCaptchaService,
+        },
+        {
+          provide: RefreshTokenService,
+          useValue: mockRefreshTokenService,
         },
       ],
     }).compile();
