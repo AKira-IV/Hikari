@@ -16,7 +16,12 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto, CreateTenantDto, RefreshTokenDto } from './dto/auth.dto';
+import {
+  LoginDto,
+  RegisterDto,
+  CreateTenantDto,
+  RefreshTokenDto,
+} from './dto/auth.dto';
 import { User } from '../database/entities/user.entity';
 
 interface RequestWithUser extends Request {

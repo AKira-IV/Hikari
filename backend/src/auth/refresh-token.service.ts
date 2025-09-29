@@ -26,7 +26,8 @@ export class RefreshTokenService {
     const token = this.generateRandomToken();
 
     // Configurar expiración (por defecto 7 días)
-    const expirationDays = this.configService.get<number>('REFRESH_TOKEN_EXPIRATION_DAYS') || 7;
+    const expirationDays =
+      this.configService.get<number>('REFRESH_TOKEN_EXPIRATION_DAYS') || 7;
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + expirationDays);
 

@@ -1,4 +1,4 @@
-﻿# Hikari Makefile
+# Hikari Makefile
 .PHONY: help build up down logs clean test seed
 
 # Default target
@@ -111,3 +111,6 @@ prod-deploy: ## Deploy to production
 	make build
 	make up
 	@echo "Production environment deployed!"
+
+ci-check: ## Run local CI (lint, tests, build, docker)
+	./scripts/run-ci-checks.sh

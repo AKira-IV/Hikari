@@ -164,6 +164,24 @@ Authorization: Bearer {token}
 - [ ] DocumentaciÃ³n completa
 
 ## Testing y CI/CD
+Ejecuta make ci-check para replicar los pasos críticos del pipeline (lint, pruebas, builds y docker). El script scripts/run-ci-checks.sh acepta variables para personalizar la ejecución:
+
+- CI_FORCE_NPM_CI=1 fuerza 
+pm ci incluso si existe 
+ode_modules.
+- SKIP_E2E=1 omite los tests e2e (usa esto si no tienes PostgreSQL de pruebas levantado).
+- SKIP_DOCKER_BUILDS=1 salta los builds de imágenes Docker.
+
+> Antes de ejecutar los e2e localmente levanta la base de datos de pruebas: docker-compose -f docker-compose.dev.yml up -d db-dev.
+
+Ejecuta \make ci-check\ para replicar los pasos críticos del pipeline (lint, tests, builds y docker). El script ubicado en \scripts/run-ci-checks.sh\ admite opciones:
+
+- \CI_FORCE_NPM_CI=1\ fuerza la reinstalación de dependencias.
+- \SKIP_E2E=1\ salta los e2e (útil si no tienes PostgreSQL levantado).
+- \SKIP_DOCKER_BUILDS=1\ omite los build de imágenes.
+
+> Antes de lanzar los e2e localmente levanta la base de datos de pruebas con docker-compose -f docker-compose.dev.yml up -d db-dev.
+
 
 ### GitHub Actions
 El proyecto incluye workflows automÃ¡ticos que se ejecutan en cada push:
@@ -272,4 +290,18 @@ Hikari es un proyecto de cÃ³digo abierto bajo la licencia MIT.
 
 
 
+
+
+
+
+
+### Verificación local antes del push
+
+Ejecuta `make ci-check` para replicar los pasos críticos del pipeline (lint, pruebas, builds y docker). El script `scripts/run-ci-checks.sh` acepta variables para personalizar la ejecución:
+
+- `CI_FORCE_NPM_CI=1` fuerza `npm ci` incluso si existe `node_modules`.
+- `SKIP_E2E=1` omite los tests e2e (usa esto si no tienes PostgreSQL de pruebas levantado).
+- `SKIP_DOCKER_BUILDS=1` salta los builds de imágenes Docker.
+
+> Antes de ejecutar los e2e localmente levanta la base de datos de pruebas: `docker-compose -f docker-compose.dev.yml up -d db-dev`.
 

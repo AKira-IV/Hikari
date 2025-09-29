@@ -9,7 +9,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, UserRole } from '../database/entities/user.entity';
 import { Tenant } from '../database/entities/tenant.entity';
-import { LoginDto, RegisterDto, CreateTenantDto, RefreshTokenDto } from './dto/auth.dto';
+import {
+  LoginDto,
+  RegisterDto,
+  CreateTenantDto,
+  RefreshTokenDto,
+} from './dto/auth.dto';
 import { CaptchaService } from '../common/services/captcha.service';
 import { RefreshTokenService } from './refresh-token.service';
 
@@ -102,7 +107,11 @@ export class AuthService {
     };
   }
 
-  async refreshToken(refreshTokenDto: RefreshTokenDto, ipAddress?: string, userAgent?: string) {
+  async refreshToken(
+    refreshTokenDto: RefreshTokenDto,
+    ipAddress?: string,
+    userAgent?: string,
+  ) {
     // Validar refresh token y obtener usuario
     const user = await this.refreshTokenService.validateRefreshToken(
       refreshTokenDto.refreshToken,
