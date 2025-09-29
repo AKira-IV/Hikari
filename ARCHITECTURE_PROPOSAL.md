@@ -1,6 +1,6 @@
 // Ejemplo de estructura hexagonal propuesta
 
-// 🎯 DOMAIN LAYER (Core Business Logic)
+// DOMAIN LAYER (Core Business Logic)
 src/
 ├── domain/
 │   ├── patients/
@@ -43,7 +43,7 @@ src/
 │       ├── ExternalServicesConfig.ts
 │       └── ModuleLoader.ts
 
-// 🚪 APPLICATION LAYER (Use Cases/Ports)
+// APPLICATION LAYER (Use Cases/Ports)
 ├── application/
 │   ├── use-cases/
 │   │   ├── CreatePatientUseCase.ts
@@ -59,7 +59,7 @@ src/
 │       ├── PatientCreatedHandler.ts
 │       └── AppointmentScheduledHandler.ts
 
-// 🏗️ MODULES (Pluggable Components)
+// MODULES (Pluggable Components)
 └── modules/
     ├── core/ (Always included)
     ├── billing/ (Optional)
