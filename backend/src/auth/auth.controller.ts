@@ -1,8 +1,32 @@
-import { Controller, Post, Body, UseGuards, Request, Get } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+  Get,
+  Ip,
+  Headers,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto, CreateTenantDto } from './dto/auth.dto';
+import {
+  LoginDto,
+  RegisterDto,
+  CreateTenantDto,
+  RefreshTokenDto,
+} from './dto/auth.dto';
+import { User } from '../database/entities/user.entity';
+
+interface RequestWithUser extends Request {
+  user: User;
+}
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -14,8 +38,13 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   @Post('login')
   @UseGuards(AuthGuard('local'))
-  async login(@Request() req, @Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(
+    @Request() req: RequestWithUser,
+    @Body() loginDto: LoginDto,
+    @Ip() ip: string,
+    @Headers('user-agent') userAgent: string,
+  ) {
+    return this.authService.login(loginDto, ip, userAgent);
   }
 
   @ApiOperation({ summary: 'Register new user' })
@@ -35,11 +64,44 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Get current user profile' })
-  @ApiResponse({ status: 200, description: 'User profile retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'User profile retrieved successfully',
+  })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Get('profile')
-  getProfile(@Request() req) {
+  getProfile(@Request() req: RequestWithUser): User {
     return req.user;
+  }
+
+  @ApiOperation({ summary: 'Refresh access token' })
+  @ApiResponse({ status: 200, description: 'Token refreshed successfully' })
+  @ApiResponse({ status: 401, description: 'Invalid refresh token' })
+  @Post('refresh')
+  async refreshToken(
+    @Body() refreshTokenDto: RefreshTokenDto,
+    @Ip() ip: string,
+    @Headers('user-agent') userAgent: string,
+  ) {
+    return this.authService.refreshToken(refreshTokenDto, ip, userAgent);
+  }
+
+  @ApiOperation({ summary: 'Logout user (revoke refresh token)' })
+  @ApiResponse({ status: 200, description: 'Logged out successfully' })
+  @Post('logout')
+  async logout(@Body() body: { refreshToken: string }) {
+    await this.authService.logout(body.refreshToken);
+    return { message: 'Logged out successfully' };
+  }
+
+  @ApiOperation({ summary: 'Logout from all sessions' })
+  @ApiResponse({ status: 200, description: 'Logged out from all sessions' })
+  @Post('logout-all')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  async logoutAll(@Request() req: RequestWithUser) {
+    await this.authService.logoutAllSessions(req.user.id);
+    return { message: 'Logged out from all sessions' };
   }
 }

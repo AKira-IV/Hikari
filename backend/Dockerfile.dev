@@ -1,0 +1,36 @@
+# Development Dockerfile - Optimized
+FROM node:18-alpine
+
+# Install dumb-init for proper signal handling
+RUN apk add --no-cache dumb-init
+
+# Create non-root user first
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nestjs -u 1001
+
+# Set working directory
+WORKDIR /usr/src/app
+
+# Change ownership of working directory
+RUN chown nestjs:nodejs /usr/src/app
+
+# Switch to non-root user
+USER nestjs
+
+# Copy package files with correct ownership
+COPY --chown=nestjs:nodejs package*.json ./
+
+# Install all dependencies (including dev)
+RUN npm ci && npm cache clean --force
+
+# Copy source code with correct ownership
+COPY --chown=nestjs:nodejs . .
+
+# Expose port
+EXPOSE 3000
+
+# Use dumb-init for proper signal handling
+ENTRYPOINT ["dumb-init", "--"]
+
+# Start in development mode with hot reload
+CMD ["npm", "run", "start:dev"]

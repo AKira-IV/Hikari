@@ -1,20 +1,56 @@
-# Usa una imagen base de Node.js
-FROM node:16
+# Multi-stage build for production optimization
+FROM node:18-alpine AS builder
 
-# Crear y acceder al directorio de trabajo
+# Set working directory
 WORKDIR /usr/src/app
 
-# Copiar el package.json y package-lock.json
+# Copy package files
 COPY package*.json ./
 
-# Instalar dependencias
-RUN npm install
+# Install ALL dependencies (including dev) for build
+RUN npm ci && npm cache clean --force
 
-# Copiar todo el código fuente
+# Copy source code
 COPY . .
 
-# Exponer el puerto en el que se ejecuta la app
+# Build the application
+RUN npm run build
+
+# Production stage
+FROM node:18-alpine AS production
+
+# Install dumb-init for proper signal handling
+RUN apk add --no-cache dumb-init
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nestjs -u 1001
+
+# Set working directory
+WORKDIR /usr/src/app
+
+# Copy package files
+COPY package*.json ./
+
+# Install only production dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Copy built application from builder stage
+COPY --from=builder /usr/src/app/dist ./dist
+
+# Change ownership to non-root user
+RUN chown -R nestjs:nodejs /usr/src/app
+USER nestjs
+
+# Expose port
 EXPOSE 3000
 
-# Comando para iniciar la aplicación
-CMD ["npm", "run", "start:prod"]
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node dist/health-check.js
+
+# Use dumb-init for proper signal handling
+ENTRYPOINT ["dumb-init", "--"]
+
+# Start the application
+CMD ["node", "dist/main.js"]

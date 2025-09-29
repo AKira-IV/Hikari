@@ -1,0 +1,64 @@
+﻿version: '3.8'
+
+services:
+  backend-dev:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_HOST=db-dev
+      - DATABASE_PORT=5432
+      - DATABASE_USERNAME=hikari_user
+      - DATABASE_PASSWORD=hikari_password
+      - DATABASE_NAME=hikari
+      - JWT_SECRET=dev-super-secret-jwt-key
+      - JWT_EXPIRATION=15m
+      - REFRESH_TOKEN_EXPIRATION_DAYS=7
+      - PORT=3000
+      - RECAPTCHA_ENABLED=false
+      - RECAPTCHA_SECRET=
+      - RECAPTCHA_MIN_SCORE=0.5
+    depends_on:
+      db-dev:
+        condition: service_healthy
+    volumes:
+      - ./backend/src:/usr/src/app/src
+      - ./backend/package.json:/usr/src/app/package.json
+      - ./backend/package-lock.json:/usr/src/app/package-lock.json
+      - /usr/src/app/node_modules
+    command: ["npm", "run", "start:dev"]
+    restart: unless-stopped
+
+  db-dev:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: hikari_user
+      POSTGRES_PASSWORD: hikari_password
+      POSTGRES_DB: hikari
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./backend/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hikari_user -d hikari"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db-dev
+    restart: unless-stopped
+
+volumes:
+  postgres_dev_data:
+

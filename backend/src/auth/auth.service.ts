@@ -1,10 +1,22 @@
-import { Injectable, UnauthorizedException, ConflictException, NotFoundException } from '@nestjs/common';
+﻿import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, UserRole } from '../database/entities/user.entity';
 import { Tenant } from '../database/entities/tenant.entity';
-import { LoginDto, RegisterDto, CreateTenantDto } from './dto/auth.dto';
+import {
+  LoginDto,
+  RegisterDto,
+  CreateTenantDto,
+  RefreshTokenDto,
+} from './dto/auth.dto';
+import { CaptchaService } from '../common/services/captcha.service';
+import { RefreshTokenService } from './refresh-token.service';
 
 @Injectable()
 export class AuthService {
@@ -14,11 +26,17 @@ export class AuthService {
     @InjectRepository(Tenant)
     private tenantRepository: Repository<Tenant>,
     private jwtService: JwtService,
+    private captchaService: CaptchaService,
+    private refreshTokenService: RefreshTokenService,
   ) {}
 
-  async validateUser(email: string, password: string, tenantSubdomain: string): Promise<User | null> {
+  async validateUser(
+    email: string,
+    password: string,
+    tenantSubdomain: string,
+  ): Promise<User | null> {
     const tenant = await this.tenantRepository.findOne({
-      where: { subdomain: tenantSubdomain, isActive: true }
+      where: { subdomain: tenantSubdomain, isActive: true },
     });
 
     if (!tenant) {
@@ -27,10 +45,10 @@ export class AuthService {
 
     const user = await this.userRepository.findOne({
       where: { email, tenantId: tenant.id, isActive: true },
-      relations: ['tenant']
+      relations: ['tenant'],
     });
 
-    if (user && await user.validatePassword(password)) {
+    if (user && (await user.validatePassword(password))) {
       return user;
     }
     return null;
@@ -39,12 +57,16 @@ export class AuthService {
   async findUserById(userId: string): Promise<User | null> {
     return this.userRepository.findOne({
       where: { id: userId, isActive: true },
-      relations: ['tenant']
+      relations: ['tenant'],
     });
   }
 
-  async login(loginDto: LoginDto) {
-    const user = await this.validateUser(loginDto.email, loginDto.password, loginDto.tenantSubdomain);
+  async login(loginDto: LoginDto, ipAddress?: string, userAgent?: string) {
+    const user = await this.validateUser(
+      loginDto.email,
+      loginDto.password,
+      loginDto.tenantSubdomain,
+    );
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -54,11 +76,22 @@ export class AuthService {
       sub: user.id,
       role: user.role,
       tenantId: user.tenantId,
-      tenantSubdomain: user.tenant.subdomain
+      tenantSubdomain: user.tenant.subdomain,
     };
 
+    // Generar access token (corta duración)
+    const accessToken = this.jwtService.sign(payload);
+
+    // Generar refresh token (larga duración)
+    const refreshToken = await this.refreshTokenService.generateRefreshToken(
+      user,
+      ipAddress,
+      userAgent,
+    );
+
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: accessToken,
+      refresh_token: refreshToken.token,
       user: {
         id: user.id,
         email: user.email,
@@ -68,15 +101,71 @@ export class AuthService {
         tenant: {
           id: user.tenant.id,
           name: user.tenant.name,
-          subdomain: user.tenant.subdomain
-        }
-      }
+          subdomain: user.tenant.subdomain,
+        },
+      },
     };
   }
 
+  async refreshToken(
+    refreshTokenDto: RefreshTokenDto,
+    ipAddress?: string,
+    userAgent?: string,
+  ) {
+    // Validar refresh token y obtener usuario
+    const user = await this.refreshTokenService.validateRefreshToken(
+      refreshTokenDto.refreshToken,
+    );
+
+    // Rotar el refresh token por seguridad
+    const newRefreshToken = await this.refreshTokenService.rotateRefreshToken(
+      refreshTokenDto.refreshToken,
+      ipAddress,
+      userAgent,
+    );
+
+    // Generar nuevo access token
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      role: user.role,
+      tenantId: user.tenantId,
+      tenantSubdomain: user.tenant.subdomain,
+    };
+
+    const accessToken = this.jwtService.sign(payload);
+
+    return {
+      access_token: accessToken,
+      refresh_token: newRefreshToken.token,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        tenant: {
+          id: user.tenant.id,
+          name: user.tenant.name,
+          subdomain: user.tenant.subdomain,
+        },
+      },
+    };
+  }
+
+  async logout(refreshToken: string): Promise<void> {
+    await this.refreshTokenService.revokeRefreshToken(refreshToken);
+  }
+
+  async logoutAllSessions(userId: string): Promise<void> {
+    await this.refreshTokenService.revokeAllUserTokens(userId);
+  }
+
   async register(registerDto: RegisterDto) {
+    await this.captchaService.verify(registerDto.captchaToken);
+
     const tenant = await this.tenantRepository.findOne({
-      where: { subdomain: registerDto.tenantSubdomain, isActive: true }
+      where: { subdomain: registerDto.tenantSubdomain, isActive: true },
     });
 
     if (!tenant) {
@@ -84,7 +173,7 @@ export class AuthService {
     }
 
     const existingUser = await this.userRepository.findOne({
-      where: { email: registerDto.email, tenantId: tenant.id }
+      where: { email: registerDto.email, tenantId: tenant.id },
     });
 
     if (existingUser) {
@@ -99,20 +188,19 @@ export class AuthService {
       phone: registerDto.phone,
       address: registerDto.address,
       role: registerDto.role || UserRole.PATIENT,
-      tenantId: tenant.id
+      tenantId: tenant.id,
     });
 
     const savedUser = await this.userRepository.save(user);
 
-    // Remove password from response
-    const { password, ...userWithoutPassword } = savedUser;
+    const { password: _, ...userWithoutPassword } = savedUser;
     return userWithoutPassword;
   }
 
   async createTenant(createTenantDto: CreateTenantDto) {
     // Check if tenant subdomain already exists
     const existingTenant = await this.tenantRepository.findOne({
-      where: { subdomain: createTenantDto.subdomain }
+      where: { subdomain: createTenantDto.subdomain },
     });
 
     if (existingTenant) {
@@ -121,7 +209,7 @@ export class AuthService {
 
     // Check if admin email already exists in any tenant
     const existingUser = await this.userRepository.findOne({
-      where: { email: createTenantDto.adminEmail }
+      where: { email: createTenantDto.adminEmail },
     });
 
     if (existingUser) {
@@ -132,7 +220,7 @@ export class AuthService {
     const tenant = this.tenantRepository.create({
       name: createTenantDto.name,
       subdomain: createTenantDto.subdomain,
-      description: createTenantDto.description
+      description: createTenantDto.description,
     });
 
     const savedTenant = await this.tenantRepository.save(tenant);
@@ -144,7 +232,7 @@ export class AuthService {
       firstName: createTenantDto.adminFirstName,
       lastName: createTenantDto.adminLastName,
       role: UserRole.ADMIN,
-      tenantId: savedTenant.id
+      tenantId: savedTenant.id,
     });
 
     await this.userRepository.save(adminUser);
@@ -154,14 +242,14 @@ export class AuthService {
         id: savedTenant.id,
         name: savedTenant.name,
         subdomain: savedTenant.subdomain,
-        description: savedTenant.description
-      }
+        description: savedTenant.description,
+      },
     };
   }
 
   async findTenantBySubdomain(subdomain: string): Promise<Tenant | null> {
     return this.tenantRepository.findOne({
-      where: { subdomain, isActive: true }
+      where: { subdomain, isActive: true },
     });
   }
 }
