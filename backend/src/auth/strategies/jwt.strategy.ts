@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import {
   ExtractJwt,
@@ -18,6 +18,8 @@ interface JwtPayload {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
+  private readonly logger = new Logger(JwtStrategy.name);
+
   constructor(
     private configService: ConfigService,
     private authService: AuthService,
@@ -43,8 +45,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         audience: configService.get<string>('JWT_AUDIENCE', 'hikari-users'),
       };
     } else {
-      // Fallback to symmetric for development
-      console.warn('JWT_PUBLIC_KEY not found, using symmetric verification');
+      // Fallback to symmetric for development only
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error('JWT configuration invalid for production environment');
+      }
+
       jwtConfig = {
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
         ignoreExpiration: false,
@@ -53,6 +58,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     super(jwtConfig);
+
+    // Log warning after super() call
+    if (!publicKeyBase64) {
+      this.logger.warn(
+        'Authentication configuration incomplete - using fallback mode',
+      );
+    }
   }
 
   async validate(payload: JwtPayload): Promise<User | null> {

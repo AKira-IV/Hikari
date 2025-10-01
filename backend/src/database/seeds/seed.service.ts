@@ -49,9 +49,22 @@ export class SeedService {
         .returning('*')
         .execute();
 
-      const tenant = result.raw[0] || result.generatedMaps[0];
+      let tenant: Tenant;
+      if (Array.isArray(result.raw) && result.raw.length > 0) {
+        tenant = result.raw[0] as Tenant;
+      } else if (
+        Array.isArray(result.generatedMaps) &&
+        result.generatedMaps.length > 0
+      ) {
+        tenant = result.generatedMaps[0] as Tenant;
+      } else {
+        throw new Error(
+          'Upserted tenant not returned by database - check RETURNING clause',
+        );
+      }
+
       console.log('Demo tenant ready (created or updated)');
-      return tenant as Tenant;
+      return tenant;
     } catch (error: unknown) {
       // Fallback: si el upsert falla, buscar el existente
       const existing = await this.tenantRepository.findOne({
