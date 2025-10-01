@@ -56,7 +56,7 @@ export class User {
   address: string;
 
   @Column({ type: 'json', nullable: true })
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 
   @ManyToOne(() => Tenant, (tenant) => tenant.users, { nullable: false })
   @JoinColumn({ name: 'tenantId' })

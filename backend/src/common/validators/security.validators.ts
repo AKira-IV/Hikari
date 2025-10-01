@@ -20,7 +20,7 @@ export function IsNotSQLInjection(validationOptions?: ValidationOptions) {
       propertyName: propertyName,
       options: validationOptions,
       validator: {
-        validate(value: any, _args: ValidationArguments) {
+        validate(value: unknown, _args: ValidationArguments) {
           if (typeof value !== 'string') return true;
 
           const sqlInjectionPatterns = [
@@ -57,7 +57,7 @@ export function IsNotXSS(validationOptions?: ValidationOptions) {
       propertyName: propertyName,
       options: validationOptions,
       validator: {
-        validate(value: any, _args: ValidationArguments) {
+        validate(value: unknown, _args: ValidationArguments) {
           if (typeof value !== 'string') return true;
 
           const xssPatterns = [
@@ -94,8 +94,8 @@ export function IsSecureTenantId(validationOptions?: ValidationOptions) {
       propertyName: propertyName,
       options: validationOptions,
       validator: {
-        validate(value: any, _args: ValidationArguments) {
-          if (!value) return false;
+        validate(value: unknown, _args: ValidationArguments) {
+          if (!value || typeof value !== 'string') return false;
 
           // Must be UUID format
           const uuidPattern =
@@ -127,7 +127,7 @@ export function IsStrongPassword(validationOptions?: ValidationOptions) {
       propertyName: propertyName,
       options: validationOptions,
       validator: {
-        validate(value: any, _args: ValidationArguments) {
+        validate(value: unknown, _args: ValidationArguments) {
           if (typeof value !== 'string') return false;
 
           // OWASP password requirements
@@ -165,7 +165,7 @@ export function IsSecureInput(validationOptions?: ValidationOptions) {
       propertyName: propertyName,
       options: validationOptions,
       validator: {
-        validate(value: any, _args: ValidationArguments) {
+        validate(value: unknown, _args: ValidationArguments) {
           if (typeof value !== 'string') return true;
 
           // Combined security patterns

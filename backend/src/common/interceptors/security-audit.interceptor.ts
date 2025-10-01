@@ -21,7 +21,7 @@ export class SecurityAuditInterceptor implements NestInterceptor {
 
   constructor(private securityService: SecurityService) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
     const handler = context.getHandler();
@@ -102,7 +102,7 @@ export class SecurityAuditInterceptor implements NestInterceptor {
    * Checks response data for potential tenant data leakage
    */
   private checkDataLeakage(
-    data: any,
+    data: unknown,
     userTenantId: string,
     operation: string,
   ): void {
@@ -145,7 +145,7 @@ export class SecurityAuditInterceptor implements NestInterceptor {
   /**
    * Determines if an error is security-related
    */
-  private isSecurityRelatedError(error: any): boolean {
+  private isSecurityRelatedError(error: unknown): boolean {
     const securityKeywords = [
       'unauthorized',
       'forbidden',
@@ -158,7 +158,9 @@ export class SecurityAuditInterceptor implements NestInterceptor {
       'validation',
     ];
 
-    const message = String(error?.message || '').toLowerCase();
+    const message = String(
+      (error as { message?: string })?.message || '',
+    ).toLowerCase();
     return securityKeywords.some((keyword) =>
       String(message).includes(keyword),
     );

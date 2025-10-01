@@ -4,6 +4,7 @@ import {
   ExecutionContext,
   ForbiddenException,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { SecurityService } from '../services/security.service';
 
 /**
@@ -43,9 +44,11 @@ export class TenantIsolationGuard implements CanActivate {
       }
 
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage =
+        (error as { message?: string })?.message || 'Unknown error';
       throw new ForbiddenException(
-        `Tenant isolation violation: ${error.message}`,
+        `Tenant isolation violation: ${errorMessage}`,
       );
     }
   }
@@ -53,7 +56,13 @@ export class TenantIsolationGuard implements CanActivate {
   /**
    * Extracts tenant ID from various request sources
    */
-  private extractTenantIdFromRequest(request: any): string | null {
+  private extractTenantIdFromRequest(
+    request: Request & {
+      params?: { tenantId?: string };
+      query?: { tenantId?: string };
+      body?: { tenantId?: string };
+    },
+  ): string | null {
     // Check URL parameters
     if (request.params?.tenantId) {
       return request.params.tenantId;
@@ -70,8 +79,9 @@ export class TenantIsolationGuard implements CanActivate {
     }
 
     // Check headers (for API calls)
-    if (request.headers['x-tenant-id']) {
-      return request.headers['x-tenant-id'];
+    const tenantHeader = request.headers['x-tenant-id'];
+    if (tenantHeader) {
+      return Array.isArray(tenantHeader) ? tenantHeader[0] : tenantHeader;
     }
 
     return null;

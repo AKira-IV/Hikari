@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import {
+  ExtractJwt,
+  Strategy,
+  StrategyOptionsWithoutRequest,
+} from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth.service';
 import { User } from '../../database/entities/user.entity';
@@ -18,16 +22,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private configService: ConfigService,
     private authService: AuthService,
   ) {
-    // ✅ RSA Asymmetric Verification - Only public key needed
+    // RSA Asymmetric Verification - Only public key needed
     // TODO: Upgrade to ED25519 when @nestjs/jwt supports EdDSA algorithm
     const publicKeyBase64 = configService.get<string>('JWT_PUBLIC_KEY');
     const fallbackSecret = configService.get<string>('JWT_SECRET');
 
-    let jwtConfig: any;
+    let jwtConfig: StrategyOptionsWithoutRequest;
 
     if (publicKeyBase64) {
       // Asymmetric verification with RSA-SHA256
-      const publicKey = Buffer.from(publicKeyBase64, 'base64').toString('utf-8');
+      const publicKey = Buffer.from(publicKeyBase64, 'base64').toString(
+        'utf-8',
+      );
       jwtConfig = {
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
         ignoreExpiration: false,

@@ -29,14 +29,14 @@ describe('AppController (e2e)', () => {
   });
 
   it('/ (GET)', () => {
-    return request(app.getHttpServer())
+    return request(app.getHttpServer() as Parameters<typeof request>[0])
       .get('/')
       .expect(200)
       .expect('Hello World!');
   });
 
   it('/health (GET)', () => {
-    return request(app.getHttpServer())
+    return request(app.getHttpServer() as Parameters<typeof request>[0])
       .get('/health')
       .expect(200)
       .expect((res) => {

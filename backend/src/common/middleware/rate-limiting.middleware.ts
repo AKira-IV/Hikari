@@ -96,8 +96,11 @@ export class RateLimitingMiddleware implements NestMiddleware {
     const userAgent = req.headers['user-agent'] || 'unknown';
 
     // If authenticated, use user ID + tenant ID for more granular limiting
-    if ((req as any).user) {
-      const user = (req as any).user;
+    const requestWithUser = req as Request & {
+      user?: { id: string; tenantId?: string };
+    };
+    if (requestWithUser.user) {
+      const user = requestWithUser.user;
       return `${user.id}-${user.tenantId || 'unknown'}`;
     }
 

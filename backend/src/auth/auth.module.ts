@@ -19,23 +19,30 @@ import { RefreshToken } from '../database/entities/refresh-token.entity';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        // ✅ RSA Asymmetric Cryptography - Compatible with current NestJS JWT
+        // RSA Asymmetric Cryptography - Compatible with current NestJS JWT
         // TODO: Upgrade to ED25519 when @nestjs/jwt supports EdDSA algorithm
         const privateKeyBase64 = configService.get<string>('JWT_PRIVATE_KEY');
         const publicKeyBase64 = configService.get<string>('JWT_PUBLIC_KEY');
 
         if (!privateKeyBase64 || !publicKeyBase64) {
-          console.warn('JWT keys not found, falling back to symmetric for development');
+          console.warn(
+            'JWT keys not found, falling back to symmetric for development',
+          );
           return {
-            secret: configService.get<string>('JWT_SECRET') || 'fallback-dev-secret',
+            secret:
+              configService.get<string>('JWT_SECRET') || 'fallback-dev-secret',
             signOptions: {
               expiresIn: configService.get<string>('JWT_EXPIRATION') || '15m',
             },
           };
         }
 
-        const privateKey = Buffer.from(privateKeyBase64, 'base64').toString('utf-8');
-        const publicKey = Buffer.from(publicKeyBase64, 'base64').toString('utf-8');
+        const privateKey = Buffer.from(privateKeyBase64, 'base64').toString(
+          'utf-8',
+        );
+        const publicKey = Buffer.from(publicKeyBase64, 'base64').toString(
+          'utf-8',
+        );
 
         return {
           privateKey,

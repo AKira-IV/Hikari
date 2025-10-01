@@ -2,7 +2,7 @@
 
 ## Security Improvements Applied
 
-### 1. Eliminated Database Query Anti-patterns ✅
+### 1. Eliminated Database Query Anti-patterns [COMPLETED]
 
 **Problem**: The seed service was using `findOne()` queries before creating users, violating the principle of trusting database constraints.
 
@@ -16,7 +16,7 @@
 - Relies on database constraints as intended
 - Handles concurrency better
 
-### 2. Migrated from Symmetric to Asymmetric JWT ✅
+### 2. Migrated from Symmetric to Asymmetric JWT [COMPLETED]
 
 **Problem**: JWT was using HS256 (symmetric) algorithm with shared secret, which is less secure.
 
@@ -108,7 +108,7 @@ if (!existing) {
 
 **After (Optimized)**:
 ```typescript
-// ✅ GOOD: Trust database constraints
+// GOOD: Trust database constraints
 await this.userRepository
   .createQueryBuilder()
   .insert()

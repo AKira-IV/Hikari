@@ -4,6 +4,7 @@ import { Strategy } from 'passport-local';
 import { Request } from 'express';
 import { AuthService } from '../auth.service';
 import { CaptchaService } from '../../common/services/captcha.service';
+import { User } from '../../database/entities/user.entity';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -17,7 +18,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(req: Request, email: string, password: string): Promise<any> {
+  async validate(req: Request, email: string, password: string): Promise<User> {
     const body = req.body as {
       tenantSubdomain?: string;
       captchaToken?: string;

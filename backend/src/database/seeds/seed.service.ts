@@ -34,7 +34,7 @@ export class SeedService {
 
   private async upsertDemoTenant(): Promise<Tenant> {
     try {
-      // ✅ BUENO: Confiar en constraints, usar INSERT ON CONFLICT
+      // GOOD: Trust constraints, use INSERT ON CONFLICT
       const result = await this.tenantRepository
         .createQueryBuilder()
         .insert()
@@ -52,7 +52,7 @@ export class SeedService {
       const tenant = result.raw[0] || result.generatedMaps[0];
       console.log('Demo tenant ready (created or updated)');
       return tenant as Tenant;
-    } catch (error) {
+    } catch (error: unknown) {
       // Fallback: si el upsert falla, buscar el existente
       const existing = await this.tenantRepository.findOne({
         where: { subdomain: 'demo' },
@@ -73,7 +73,7 @@ export class SeedService {
     );
 
     try {
-      // ✅ BUENO: Intentar crear directamente, confiar en constraints
+      // GOOD: Try to create directly, trust constraints
       await this.userRepository
         .createQueryBuilder()
         .insert()
@@ -91,7 +91,7 @@ export class SeedService {
         .execute();
 
       this.logCredential('admin@demo.com', password, 'SEED_ADMIN_PASSWORD');
-    } catch (error) {
+    } catch (error: unknown) {
       // Si el constraint falla, es que ya existe
       if (this.isUniqueConstraintError(error)) {
         console.log('Admin user already exists (constraint)');
@@ -127,7 +127,7 @@ export class SeedService {
         .execute();
 
       this.logCredential('doctor@demo.com', password, 'SEED_DOCTOR_PASSWORD');
-    } catch (error) {
+    } catch (error: unknown) {
       if (this.isUniqueConstraintError(error)) {
         console.log('Doctor user already exists (constraint)');
         return;
@@ -162,7 +162,7 @@ export class SeedService {
         .execute();
 
       this.logCredential('nurse@demo.com', password, 'SEED_NURSE_PASSWORD');
-    } catch (error) {
+    } catch (error: unknown) {
       if (this.isUniqueConstraintError(error)) {
         console.log('Nurse user already exists (constraint)');
         return;
@@ -172,9 +172,12 @@ export class SeedService {
     }
   }
 
-  private isUniqueConstraintError(error: any): boolean {
+  private isUniqueConstraintError(error: unknown): boolean {
     // PostgreSQL unique constraint violation
-    return error?.code === '23505' || error?.constraint?.includes('unique');
+    const err = error as { code?: string; constraint?: string };
+    return (
+      err?.code === '23505' || (err?.constraint?.includes('unique') ?? false)
+    );
   }
 
   private resolveSeedPassword(envKey: string, userLabel: string): string {
