@@ -88,11 +88,11 @@ export class RegisterDto {
   @IsNotSQLInjection()
   tenantSubdomain: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MaxLength(1000)
   @IsSecureInput()
-  captchaToken: string;
+  captchaToken?: string;
 }
 
 export class CreateTenantDto {
