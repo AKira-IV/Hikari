@@ -103,6 +103,7 @@ export class SeedService {
         .orIgnore() // Si ya existe, ignorar
         .execute();
 
+      // Solo log si la operación fue exitosa
       this.logCredential('admin@demo.com', password, 'SEED_ADMIN_PASSWORD');
     } catch (error: unknown) {
       // Si el constraint falla, es que ya existe
@@ -139,6 +140,7 @@ export class SeedService {
         .orIgnore()
         .execute();
 
+      // Solo log si la operación fue exitosa
       this.logCredential('doctor@demo.com', password, 'SEED_DOCTOR_PASSWORD');
     } catch (error: unknown) {
       if (this.isUniqueConstraintError(error)) {
@@ -174,6 +176,7 @@ export class SeedService {
         .orIgnore()
         .execute();
 
+      // Solo log si la operación fue exitosa
       this.logCredential('nurse@demo.com', password, 'SEED_NURSE_PASSWORD');
     } catch (error: unknown) {
       if (this.isUniqueConstraintError(error)) {

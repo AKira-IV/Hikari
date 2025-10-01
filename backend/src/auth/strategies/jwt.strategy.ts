@@ -47,7 +47,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     } else {
       // Fallback to symmetric for development only
       if (process.env.NODE_ENV === 'production') {
-        throw new Error('JWT configuration invalid for production environment');
+        throw new Error('Authentication configuration error');
       }
 
       jwtConfig = {
