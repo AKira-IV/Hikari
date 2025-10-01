@@ -59,7 +59,7 @@ export class RolesGuard implements CanActivate {
       }
 
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (
         error instanceof UnauthorizedException ||
         error instanceof ForbiddenException

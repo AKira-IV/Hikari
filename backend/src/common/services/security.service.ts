@@ -74,14 +74,14 @@ export class SecurityService {
    * Sanitizes input parameters to prevent injection
    * Addresses OWASP A03:2021 - Injection
    */
-  sanitizeInput(input: any): any {
+  sanitizeInput(input: unknown): unknown {
     if (typeof input === 'string') {
       // Basic SQL injection prevention
       return input.replace(/['"`;\\]/g, '').trim();
     }
 
     if (typeof input === 'object' && input !== null) {
-      const sanitized: any = {};
+      const sanitized: Record<string, unknown> = {};
       for (const [key, value] of Object.entries(input)) {
         // Sanitize keys and values
         const cleanKey = key.replace(/[^a-zA-Z0-9_]/g, '');
@@ -98,7 +98,7 @@ export class SecurityService {
    * SAST-style static analysis at runtime
    */
   performSecurityValidation(
-    request: any,
+    request: AuthenticatedRequest,
     operation: string,
   ): SecurityValidationResult {
     const errors: string[] = [];
@@ -107,8 +107,10 @@ export class SecurityService {
     try {
       // Validate user context
       this.validateUserContext(request);
-    } catch (error: any) {
-      errors.push(`User validation failed: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage =
+        (error as { message?: string })?.message || 'Unknown error';
+      errors.push(`User validation failed: ${errorMessage}`);
       riskLevel = 'CRITICAL';
     }
 
@@ -131,7 +133,8 @@ export class SecurityService {
     }
 
     // Rate limiting check (basic implementation)
-    if (this.isRateLimited(request.ip, operation)) {
+    const clientIp = request.ip || 'unknown';
+    if (this.isRateLimited(clientIp, operation)) {
       errors.push(`Rate limit exceeded for operation ${operation}`);
       riskLevel = 'HIGH';
     }
@@ -163,7 +166,8 @@ export class SecurityService {
    * Basic rate limiting check
    */
   // In-memory rate limit store: { [ip_operation]: { count, timestamp } }
-  private rateLimitStore: Record<string, { count: number; timestamp: number }> = {};
+  private rateLimitStore: Record<string, { count: number; timestamp: number }> =
+    {};
 
   private isRateLimited(ip: string, operation: string): boolean {
     const RATE_LIMIT = 100; // max requests per window
@@ -194,7 +198,7 @@ export class SecurityService {
   /**
    * Creates a secure request wrapper
    */
-  createSecureRequest(request: any): SecureRequest {
+  createSecureRequest(request: AuthenticatedRequest): SecureRequest {
     const validatedContext = this.validateUserContext(request);
 
     return {
@@ -202,8 +206,11 @@ export class SecurityService {
         ...request.user,
         tenant: request.user.tenant,
         tenantId: validatedContext.tenantId,
-      },
-      headers: this.sanitizeInput(request.headers || {}),
+      } as SecureRequest['user'],
+      headers: this.sanitizeInput(request.headers || {}) as Record<
+        string,
+        string
+      >,
       ip: request.ip || 'unknown',
       method: request.method || 'unknown',
       url: request.url || 'unknown',

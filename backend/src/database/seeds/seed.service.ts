@@ -24,123 +24,176 @@ export class SeedService {
 
     console.log('Starting database seeding...');
 
-    const tenant = await this.ensureDemoTenant();
-    await this.ensureAdminUser(tenant.id);
-    await this.ensureDoctorUser(tenant.id);
-    await this.ensureNurseUser(tenant.id);
+    const tenant = await this.upsertDemoTenant();
+    await this.upsertAdminUser(tenant.id);
+    await this.upsertDoctorUser(tenant.id);
+    await this.upsertNurseUser(tenant.id);
 
     console.log('Database seeding completed!');
   }
 
-  private async ensureDemoTenant(): Promise<Tenant> {
-    const existingTenant = await this.tenantRepository.findOne({
-      where: { subdomain: 'demo' },
-    });
+  private async upsertDemoTenant(): Promise<Tenant> {
+    try {
+      // GOOD: Trust constraints, use INSERT ON CONFLICT
+      const result = await this.tenantRepository
+        .createQueryBuilder()
+        .insert()
+        .into(Tenant)
+        .values({
+          name: 'Hospital Demo',
+          subdomain: 'demo',
+          description: 'Hospital demo para pruebas',
+          isActive: true,
+        })
+        .orUpdate(['name', 'description', 'isActive'], ['subdomain'])
+        .returning('*')
+        .execute();
 
-    if (existingTenant) {
-      console.log('Demo tenant already exists');
-      return existingTenant;
+      let tenant: Tenant;
+      if (Array.isArray(result.raw) && result.raw.length > 0) {
+        tenant = result.raw[0] as Tenant;
+      } else if (
+        Array.isArray(result.generatedMaps) &&
+        result.generatedMaps.length > 0
+      ) {
+        tenant = result.generatedMaps[0] as Tenant;
+      } else {
+        throw new Error(
+          'Upserted tenant not returned by database - check RETURNING clause',
+        );
+      }
+
+      console.log('Demo tenant ready (created or updated)');
+      return tenant;
+    } catch (error: unknown) {
+      // Fallback: si el upsert falla, buscar el existente
+      const existing = await this.tenantRepository.findOne({
+        where: { subdomain: 'demo' },
+      });
+      if (existing) {
+        console.log('Demo tenant already exists (fallback)');
+        return existing;
+      }
+      console.error('Failed to upsert demo tenant:', error);
+      throw error;
     }
-
-    const tenant = this.tenantRepository.create({
-      name: 'Hospital Demo',
-      subdomain: 'demo',
-      description: 'Hospital demo para pruebas',
-      isActive: true,
-    });
-
-    const savedTenant = await this.tenantRepository.save(tenant);
-    console.log('Demo tenant created');
-    return savedTenant;
   }
 
-  private async ensureAdminUser(tenantId: string): Promise<void> {
-    const existing = await this.userRepository.findOne({
-      where: { email: 'admin@demo.com', tenantId },
-    });
-
-    if (existing) {
-      console.log('Admin user already exists');
-      return;
-    }
-
+  private async upsertAdminUser(tenantId: string): Promise<void> {
     const password = this.resolveSeedPassword(
       'SEED_ADMIN_PASSWORD',
       'admin@demo.com',
     );
 
-    const adminUser = this.userRepository.create({
-      email: 'admin@demo.com',
-      password,
-      firstName: 'Admin',
-      lastName: 'Demo',
-      role: UserRole.ADMIN,
-      tenantId,
-      isActive: true,
-    });
+    try {
+      // GOOD: Try to create directly, trust constraints
+      await this.userRepository
+        .createQueryBuilder()
+        .insert()
+        .into(User)
+        .values({
+          email: 'admin@demo.com',
+          password,
+          firstName: 'Admin',
+          lastName: 'Demo',
+          role: UserRole.ADMIN,
+          tenantId,
+          isActive: true,
+        })
+        .orIgnore() // Si ya existe, ignorar
+        .execute();
 
-    await this.userRepository.save(adminUser);
-    this.logCredential('admin@demo.com', password, 'SEED_ADMIN_PASSWORD');
+      // Solo log si la operación fue exitosa
+      this.logCredential('admin@demo.com', password, 'SEED_ADMIN_PASSWORD');
+    } catch (error: unknown) {
+      // Si el constraint falla, es que ya existe
+      if (this.isUniqueConstraintError(error)) {
+        console.log('Admin user already exists (constraint)');
+        return;
+      }
+      console.error('Failed to upsert admin user:', error);
+      throw error;
+    }
   }
 
-  private async ensureDoctorUser(tenantId: string): Promise<void> {
-    const existing = await this.userRepository.findOne({
-      where: { email: 'doctor@demo.com', tenantId },
-    });
-
-    if (existing) {
-      console.log('Doctor user already exists');
-      return;
-    }
-
+  private async upsertDoctorUser(tenantId: string): Promise<void> {
     const password = this.resolveSeedPassword(
       'SEED_DOCTOR_PASSWORD',
       'doctor@demo.com',
     );
 
-    const doctorUser = this.userRepository.create({
-      email: 'doctor@demo.com',
-      password,
-      firstName: 'Dr. Juan',
-      lastName: 'Perez',
-      role: UserRole.DOCTOR,
-      tenantId,
-      isActive: true,
-      phone: '+1234567890',
-    });
+    try {
+      await this.userRepository
+        .createQueryBuilder()
+        .insert()
+        .into(User)
+        .values({
+          email: 'doctor@demo.com',
+          password,
+          firstName: 'Dr. Juan',
+          lastName: 'Perez',
+          role: UserRole.DOCTOR,
+          tenantId,
+          isActive: true,
+          phone: '+1234567890',
+        })
+        .orIgnore()
+        .execute();
 
-    await this.userRepository.save(doctorUser);
-    this.logCredential('doctor@demo.com', password, 'SEED_DOCTOR_PASSWORD');
+      // Solo log si la operación fue exitosa
+      this.logCredential('doctor@demo.com', password, 'SEED_DOCTOR_PASSWORD');
+    } catch (error: unknown) {
+      if (this.isUniqueConstraintError(error)) {
+        console.log('Doctor user already exists (constraint)');
+        return;
+      }
+      console.error('Failed to upsert doctor user:', error);
+      throw error;
+    }
   }
 
-  private async ensureNurseUser(tenantId: string): Promise<void> {
-    const existing = await this.userRepository.findOne({
-      where: { email: 'nurse@demo.com', tenantId },
-    });
-
-    if (existing) {
-      console.log('Nurse user already exists');
-      return;
-    }
-
+  private async upsertNurseUser(tenantId: string): Promise<void> {
     const password = this.resolveSeedPassword(
       'SEED_NURSE_PASSWORD',
       'nurse@demo.com',
     );
 
-    const nurseUser = this.userRepository.create({
-      email: 'nurse@demo.com',
-      password,
-      firstName: 'Maria',
-      lastName: 'Gonzalez',
-      role: UserRole.NURSE,
-      tenantId,
-      isActive: true,
-      phone: '+1234567891',
-    });
+    try {
+      await this.userRepository
+        .createQueryBuilder()
+        .insert()
+        .into(User)
+        .values({
+          email: 'nurse@demo.com',
+          password,
+          firstName: 'Maria',
+          lastName: 'Gonzalez',
+          role: UserRole.NURSE,
+          tenantId,
+          isActive: true,
+          phone: '+1234567891',
+        })
+        .orIgnore()
+        .execute();
 
-    await this.userRepository.save(nurseUser);
-    this.logCredential('nurse@demo.com', password, 'SEED_NURSE_PASSWORD');
+      // Solo log si la operación fue exitosa
+      this.logCredential('nurse@demo.com', password, 'SEED_NURSE_PASSWORD');
+    } catch (error: unknown) {
+      if (this.isUniqueConstraintError(error)) {
+        console.log('Nurse user already exists (constraint)');
+        return;
+      }
+      console.error('Failed to upsert nurse user:', error);
+      throw error;
+    }
+  }
+
+  private isUniqueConstraintError(error: unknown): boolean {
+    // PostgreSQL unique constraint violation
+    const err = error as { code?: string; constraint?: string };
+    return (
+      err?.code === '23505' || (err?.constraint?.includes('unique') ?? false)
+    );
   }
 
   private resolveSeedPassword(envKey: string, userLabel: string): string {

@@ -1,6 +1,6 @@
 # Configuración de deployment por contexto
 
-# 🏥 HOSPITAL PEQUEÑO (< 50 camas)
+# HOSPITAL PEQUEÑO (< 50 camas)
 version: '3.8'
 services:
   hikari-essential:
@@ -15,7 +15,7 @@ services:
         memory: 512M
         cpus: 0.5
 
-# 🏛️ HOSPITAL PROVINCIAL (> 200 camas)
+# PROVINCIAL HOSPITAL (> 200 beds)
 version: '3.8'
 services:
   hikari-full:
@@ -30,7 +30,7 @@ services:
         memory: 2G
         cpus: 2
 
-# 🌐 CLUSTER GUBERNAMENTAL (Multi-hospital)
+# CLUSTER GUBERNAMENTAL (Multi-hospital)
 version: '3.8'
 services:
   hikari-orchestrator:

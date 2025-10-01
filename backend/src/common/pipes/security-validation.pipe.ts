@@ -14,8 +14,11 @@ import { plainToClass } from 'class-transformer';
  * Implements SAST-style static analysis patterns
  */
 @Injectable()
-export class SecurityValidationPipe implements PipeTransform<any> {
-  async transform(value: any, { metatype }: ArgumentMetadata): Promise<any> {
+export class SecurityValidationPipe implements PipeTransform<unknown, unknown> {
+  async transform(
+    value: unknown,
+    { metatype }: ArgumentMetadata,
+  ): Promise<unknown> {
     if (!metatype || !this.toValidate(metatype)) {
       return value;
     }
@@ -62,7 +65,7 @@ export class SecurityValidationPipe implements PipeTransform<any> {
   /**
    * Sanitizes input to prevent basic injection attacks
    */
-  private sanitizeInput(value: any): any {
+  private sanitizeInput(value: unknown): unknown {
     if (value === null || value === undefined) {
       return value;
     }
@@ -114,7 +117,7 @@ export class SecurityValidationPipe implements PipeTransform<any> {
     }
 
     if (typeof value === 'object') {
-      const sanitized: any = {};
+      const sanitized: Record<string, unknown> = {};
       let propertyCount = 0;
 
       for (const [key, val] of Object.entries(value)) {
@@ -136,21 +139,27 @@ export class SecurityValidationPipe implements PipeTransform<any> {
   /**
    * Determines if a metatype should be validated
    */
-  private toValidate(metatype: Type<any>): boolean {
-    const types: Type<any>[] = [
+  private toValidate(metatype: Type<unknown>): boolean {
+    const types: Type<unknown>[] = [
       String,
       Boolean,
       Number,
       Array,
       Object,
-    ] as Type<any>[];
+    ] as Type<unknown>[];
     return !types.includes(metatype);
   }
 
   /**
    * Extracts security-related validation errors
    */
-  private extractSecurityErrors(errors: any[]): string[] {
+  private extractSecurityErrors(
+    errors: {
+      constraints?: Record<string, string>;
+      property?: string;
+      children?: unknown[];
+    }[],
+  ): string[] {
     const securityErrors: string[] = [];
 
     for (const error of errors) {
@@ -169,7 +178,8 @@ export class SecurityValidationPipe implements PipeTransform<any> {
 
       // Recursively check nested errors
       if (error.children && error.children.length > 0) {
-        securityErrors.push(...this.extractSecurityErrors(error.children));
+        const childrenAsErrors = error.children as typeof errors;
+        securityErrors.push(...this.extractSecurityErrors(childrenAsErrors));
       }
     }
 
@@ -179,7 +189,13 @@ export class SecurityValidationPipe implements PipeTransform<any> {
   /**
    * Extracts regular validation errors
    */
-  private extractRegularErrors(errors: any[]): string[] {
+  private extractRegularErrors(
+    errors: {
+      constraints?: Record<string, string>;
+      property?: string;
+      children?: unknown[];
+    }[],
+  ): string[] {
     const regularErrors: string[] = [];
 
     for (const error of errors) {
@@ -196,7 +212,8 @@ export class SecurityValidationPipe implements PipeTransform<any> {
 
       // Recursively check nested errors
       if (error.children && error.children.length > 0) {
-        regularErrors.push(...this.extractRegularErrors(error.children));
+        const childrenAsErrors = error.children as typeof errors;
+        regularErrors.push(...this.extractRegularErrors(childrenAsErrors));
       }
     }
 
