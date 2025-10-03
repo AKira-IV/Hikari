@@ -35,7 +35,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const checkAuthStatus = () => {
       const token = tokenStorage.getAccessToken();
       const refreshToken = tokenStorage.getRefreshToken();
-      
+
       if (token && refreshToken) {
         // Try to get user info from localStorage
         const storedUser = localStorage.getItem('hikari_user');

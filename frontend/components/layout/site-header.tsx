@@ -36,17 +36,17 @@ export function SiteHeader() {
 
   const getUserDisplayName = () => {
     if (!user) return '';
-    
+
     // Si es ADMIN, mostrar "ADMIN"
     if (user.role?.toLowerCase() === 'admin') {
       return 'ADMIN';
     }
-    
+
     // Si es profesional médico, mostrar su nombre
     if (user.role?.toLowerCase() === 'professional' || user.role?.toLowerCase() === 'doctor') {
       return `Dr. ${user.firstName} ${user.lastName}`;
     }
-    
+
     // Para otros roles, mostrar nombre completo
     return `${user.firstName} ${user.lastName}`;
   };
@@ -111,18 +111,18 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
           gap: 'var(--space-3)',
           transition: 'all 0.3s ease'
         }}>
           <ThemeToggle />
           {isAuthenticated && user ? (
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: 'var(--space-3)' 
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-3)'
             }}>
               <span style={{
                 fontSize: isScrolled ? '0.85rem' : '0.9rem',
@@ -136,11 +136,11 @@ export function SiteHeader() {
               }}>
                 {getUserDisplayName()}
               </span>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 onClick={handleLogout}
-                style={{ 
-                  fontSize: isScrolled ? '0.85rem' : '0.9rem', 
+                style={{
+                  fontSize: isScrolled ? '0.85rem' : '0.9rem',
                   padding: isScrolled ? 'var(--space-2) var(--space-3)' : 'var(--space-3) var(--space-4)',
                   transition: 'all 0.3s ease'
                 }}
@@ -151,10 +151,10 @@ export function SiteHeader() {
           ) : (
             <>
               <Link href="/login" style={{ textDecoration: 'none' }}>
-                <Button 
-                  variant="ghost" 
-                  style={{ 
-                    fontSize: isScrolled ? '0.85rem' : '0.95rem', 
+                <Button
+                  variant="ghost"
+                  style={{
+                    fontSize: isScrolled ? '0.85rem' : '0.95rem',
                     padding: isScrolled ? 'var(--space-2) var(--space-3)' : 'var(--space-3) var(--space-4)',
                     transition: 'all 0.3s ease'
                   }}
@@ -163,10 +163,10 @@ export function SiteHeader() {
                 </Button>
               </Link>
               <Link href="/register" style={{ textDecoration: 'none' }}>
-                <Button 
-                  variant="primary" 
-                  style={{ 
-                    fontSize: isScrolled ? '0.85rem' : '0.95rem', 
+                <Button
+                  variant="primary"
+                  style={{
+                    fontSize: isScrolled ? '0.85rem' : '0.95rem',
                     padding: isScrolled ? 'var(--space-2) var(--space-4)' : 'var(--space-3) var(--space-5)',
                     transition: 'all 0.3s ease'
                   }}
