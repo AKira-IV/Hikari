@@ -1,14 +1,26 @@
 # Hikari Makefile
-.PHONY: help build up down logs clean test seed
+.PHONY: help build up down logs clean test seed local-dev docker-check
 
 # Default target
 help: ## Show this help message
 	@echo "Hikari Development Commands:"
 	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+	@echo "🐳 Docker Commands:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | grep -E "(dev-|up|down|build)" | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+	@echo ""
+	@echo "💻 Local Development Commands:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | grep -E "(local-|start-|install)" | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+	@echo ""
+	@echo "🔧 Utility Commands:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | grep -E "(clean|test|seed|logs)" | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
-# Development commands
-dev-up: ## Start development environment
+# Docker check
+docker-check: ## Check if Docker is running
+	@docker version > /dev/null 2>&1 || (echo "❌ Docker is not running. Please start Docker Desktop first." && exit 1)
+	@echo "✅ Docker is running"
+
+# Development commands (Docker)
+dev-up: docker-check ## Start development environment with Docker
 	docker-compose -f docker-compose.dev.yml up -d
 
 dev-down: ## Stop development environment
@@ -17,11 +29,55 @@ dev-down: ## Stop development environment
 dev-logs: ## Show development logs
 	docker-compose -f docker-compose.dev.yml logs -f
 
-dev-build: ## Build development images
+dev-build: docker-check ## Build development images
 	docker-compose -f docker-compose.dev.yml build
 
+# Local development commands (without Docker)
+local-install: ## Install dependencies locally
+	@echo "📦 Installing backend dependencies..."
+	cd backend && npm install
+	@echo "📦 Installing frontend dependencies..."
+	cd frontend && npm install
+	@echo "✅ Dependencies installed"
+
+local-dev: ## Start local development servers
+	@echo "🚀 Starting Hikari in local development mode..."
+	@echo "⚠️  Make sure PostgreSQL is running on localhost:5432"
+	@echo "📋 Database: hikari_user:hikari_password@localhost:5432/hikari"
+	@echo ""
+	@echo "Starting backend on port 3000..."
+	@echo "Starting frontend on port 3001..."
+	@bash -c "cd backend && npm run start:dev &"
+	@bash -c "cd frontend && npm run dev &"
+	@echo "✅ Services started! Check:"
+	@echo "   Frontend: http://localhost:3001"
+	@echo "   Backend:  http://localhost:3000"
+
+start-backend: ## Start only backend locally
+	cd backend && npm run start:dev
+
+start-frontend: ## Start only frontend locally
+	cd frontend && npm run dev
+
+start-storybook: ## Start Storybook
+	cd frontend && npm run storybook
+
+# Database commands
+start-db-docker: docker-check ## Start only PostgreSQL with Docker
+	docker run --name hikari-postgres \
+		-e POSTGRES_USER=hikari_user \
+		-e POSTGRES_PASSWORD=hikari_password \
+		-e POSTGRES_DB=hikari \
+		-p 5432:5432 \
+		-d postgres:15-alpine
+	@echo "✅ PostgreSQL started on localhost:5432"
+
+stop-db-docker: ## Stop PostgreSQL Docker container
+	docker stop hikari-postgres || true
+	docker rm hikari-postgres || true
+
 # Production commands
-up: ## Start production environment
+up: docker-check ## Start production environment
 	docker-compose up -d
 
 down: ## Stop production environment

@@ -1,10 +1,8 @@
-﻿import Link from 'next/link';
+﻿'use client';
+
+import Link from 'next/link';
 import { Card, CardHeader, CardFooter } from '@/components/ui/card';
 import { RegisterForm } from '@/components/forms/register-form';
-
-export const metadata = {
-  title: 'Crear cuenta | Hikari Cloud',
-};
 
 export default function RegisterPage() {
   return (

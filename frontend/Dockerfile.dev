@@ -1,0 +1,27 @@
+FROM node:18-alpine
+
+WORKDIR /usr/src/app
+
+# Instalar dumb-init para manejar señales correctamente
+RUN apk add --no-cache dumb-init
+
+# Copiar package files
+COPY package*.json ./
+
+# Instalar dependencias
+RUN npm ci
+
+# Crear directorios para volúmenes
+RUN mkdir -p app components lib config public
+
+# Copiar el resto de archivos
+COPY . .
+
+# Exponer puerto
+EXPOSE 3000
+
+# Usar dumb-init como entrypoint
+ENTRYPOINT ["dumb-init", "--"]
+
+# Comando por defecto
+CMD ["npm", "run", "dev"]

@@ -1,4 +1,6 @@
-﻿import { ReactNode } from 'react';
+﻿'use client';
+
+import { ReactNode } from 'react';
 import Link from 'next/link';
 import { TenantProvider } from '@/components/providers/tenant-provider';
 
@@ -8,10 +10,10 @@ interface TenantLayoutProps {
 }
 
 const tenantNav = [
-  { href: '/dashboard', label: 'Resumen' },
-  { href: '/patients', label: 'Pacientes' },
-  { href: '/professionals', label: 'Profesionales' },
-  { href: '/appointments', label: 'Agenda' },
+  { href: '/dashboard', label: 'Dashboard', icon: '🏠' },
+  { href: '/patients', label: 'Pacientes', icon: '👥' },
+  { href: '/professionals', label: 'Profesionales', icon: '👨‍⚕️' },
+  { href: '/appointments', label: 'Agenda', icon: '📅' },
 ];
 
 export default function TenantLayout({ children, params }: TenantLayoutProps) {
@@ -19,26 +21,83 @@ export default function TenantLayout({ children, params }: TenantLayoutProps) {
 
   return (
     <TenantProvider tenant={tenant}>
-      <section className="border-b border-slate-800/60 bg-slate-950/70">
-        <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 md:px-8 md:py-12">
+      <section style={{
+        borderBottom: '1px solid var(--color-border)',
+        backgroundColor: 'var(--color-surface)',
+        background: 'linear-gradient(to bottom, var(--color-surface), var(--color-surface-subtle))'
+      }}>
+        <div style={{
+          margin: '0 auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 'var(--space-6)',
+          maxWidth: '1200px',
+          padding: 'var(--space-10) var(--space-4)'
+        }}>
           <div>
-            <p className="text-sm uppercase tracking-wide text-slate-400">Tenant seleccionado</p>
-            <h1 className="text-3xl font-semibold text-sky-300">{tenant}</h1>
+            <p style={{
+              fontSize: '0.875rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              color: 'var(--color-text-muted)'
+            }}>
+              Tenant seleccionado
+            </p>
+            <h1 style={{
+              fontSize: '1.875rem',
+              fontWeight: '600',
+              color: 'var(--color-primary)',
+              margin: '0'
+            }}>
+              {tenant}
+            </h1>
           </div>
-          <nav className="flex flex-wrap gap-4 text-sm text-slate-300">
+          <nav style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 'var(--space-4)',
+            fontSize: '0.875rem'
+          }}>
             {tenantNav.map((item) => (
               <Link
                 key={item.href}
                 href={`/${tenant}${item.href}`}
-                className="rounded-md border border-transparent px-3 py-2 transition hover:border-sky-400/50 hover:text-sky-200"
+                style={{
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid transparent',
+                  padding: 'var(--space-2) var(--space-3)',
+                  transition: 'all 0.2s ease',
+                  color: 'var(--color-text-muted)',
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-2)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--color-primary)';
+                  e.currentTarget.style.color = 'var(--color-primary)';
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-alpha)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'transparent';
+                  e.currentTarget.style.color = 'var(--color-text-muted)';
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
               >
+                <span>{item.icon}</span>
                 {item.label}
               </Link>
             ))}
           </nav>
         </div>
       </section>
-      <div className="mx-auto max-w-6xl px-4 py-10 md:px-8">{children}</div>
+      <div style={{
+        margin: '0 auto',
+        maxWidth: '1200px',
+        padding: 'var(--space-10) var(--space-4)'
+      }}>
+        {children}
+      </div>
     </TenantProvider>
   );
 }

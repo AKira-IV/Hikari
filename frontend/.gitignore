@@ -22,3 +22,6 @@ build
 *.log
 
 tsconfig.tsbuildinfo
+
+*storybook.log
+storybook-static

@@ -1,27 +1,80 @@
-﻿import Link from 'next/link';
+﻿'use client';
+
+import Link from 'next/link';
 import { Card, CardHeader, CardFooter } from '@/components/ui/card';
 import { LoginForm } from '@/components/forms/login-form';
 
-export const metadata = {
-  title: 'Iniciar sesión | Hikari Cloud',
-};
-
 export default function LoginPage() {
   return (
-    <div className="flex min-h-[80vh] items-center justify-center px-4 py-16">
-      <Card className="w-full max-w-lg">
-        <CardHeader
-          title="Bienvenido de nuevo"
-          subtitle="Accede a tu tenant hospitalario con credenciales protegidas por reCAPTCHA."
-        />
-        <LoginForm />
-        <CardFooter>
-          <span className="text-slate-400">¿Sin cuenta?</span>
-          <Link href="/register" className="text-sky-400 hover:text-sky-300">
-            Crea una organización
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'var(--color-background)',
+      padding: 'var(--space-6)',
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: '480px',
+      }}>
+        <div style={{
+          textAlign: 'center',
+          marginBottom: 'var(--space-8)',
+        }}>
+          <h1 style={{
+            fontSize: '2rem',
+            fontWeight: '600',
+            color: 'var(--color-text)',
+            margin: '0 0 var(--space-2) 0',
+            fontFamily: 'var(--font-family-base)',
+          }}>
+            Bienvenido a Hikari
+          </h1>
+          <p style={{
+            fontSize: '1rem',
+            color: 'var(--color-text-muted)',
+            margin: 0,
+            lineHeight: '1.5',
+          }}>
+            Accede a tu cuenta para gestionar tu centro médico
+          </p>
+        </div>
+
+        <div style={{
+          backgroundColor: 'var(--color-surface)',
+          padding: 'var(--space-8)',
+          borderRadius: 'var(--radius-lg)',
+          boxShadow: 'var(--shadow-lg)',
+          border: '1px solid var(--color-border-light)',
+        }}>
+          <LoginForm />
+        </div>
+
+        <div style={{
+          textAlign: 'center',
+          marginTop: 'var(--space-6)',
+          padding: 'var(--space-4)',
+        }}>
+          <span style={{
+            color: 'var(--color-text-muted)',
+            fontSize: '0.95rem',
+          }}>
+            ¿Aún no tienes cuenta?{' '}
+          </span>
+          <Link
+            href="/register"
+            style={{
+              color: 'var(--color-primary)',
+              textDecoration: 'none',
+              fontWeight: '600',
+              fontSize: '0.95rem',
+            }}
+          >
+            Crear organización
           </Link>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

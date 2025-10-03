@@ -1,11 +1,22 @@
-# Docker Setup Guide para Hikari
+# 🐳 Docker Setup Guide para Hikari
 
-## Prerrequisitos
+## 🎯 Opciones de Desarrollo
+
+Hikari soporta **3 modos de desarrollo**:
+
+1. **🐳 Full Docker** - Todo en contenedores (recomendado para producción)
+2. **🔀 Híbrido** - Solo base de datos en Docker, aplicaciones locales (recomendado para desarrollo)
+3. **💻 Local** - Todo local (requiere PostgreSQL instalado)
+
+---
+
+## 📋 Prerrequisitos
 
 ### Windows
-1. **Docker Desktop**: Descargar e instalar desde [docker.com](https://www.docker.com/products/docker-desktop/)
+1. **Docker Desktop**: Descargar desde [docker.com](https://www.docker.com/products/docker-desktop/)
 2. **WSL2**: Habilitar Windows Subsystem for Linux 2
-3. **Git**: Para clonar el repositorio
+3. **Node.js 18+**: Para desarrollo local
+4. **Git**: Para clonar el repositorio
 
 ### Linux/macOS
 ```bash
@@ -18,15 +29,93 @@ sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-
 sudo chmod +x /usr/local/bin/docker-compose
 ```
 
-## Inicio Rápido
+---
 
-### 1. Clonar y Setup Inicial
+## 🚀 Inicio Rápido
+
+### Opción 1: 🐳 Full Docker (Todo en contenedores)
+
 ```bash
+# Clonar repositorio
 git clone https://github.com/AKira-IV/Hikari.git
 cd Hikari
 
-# Si tienes Make instalado (recomendado)
-make dev-setup
+# Verificar Docker
+make docker-check
+
+# Iniciar todo con Docker
+make dev-up
+
+# Ver logs
+make dev-logs
+```
+
+**URLs después del inicio:**
+- 🌐 Frontend: http://localhost:3001
+- 🔧 Backend: http://localhost:3000
+- 🗄️ Database: localhost:5432
+
+### Opción 2: 🔀 Híbrido (Solo DB en Docker)
+
+```bash
+# Instalar dependencias
+make local-install
+
+# Solo base de datos en Docker
+make start-db-docker
+
+# Aplicaciones en local
+make start-backend    # Terminal 1
+make start-frontend   # Terminal 2
+```
+
+### Opción 3: 💻 Todo Local
+
+```bash
+# Instalar PostgreSQL localmente
+# Windows: https://www.postgresql.org/download/windows/
+# macOS: brew install postgresql
+# Linux: sudo apt install postgresql
+
+# Configurar base de datos
+psql -U postgres
+CREATE USER hikari_user WITH PASSWORD 'hikari_password';
+CREATE DATABASE hikari OWNER hikari_user;
+
+# Instalar dependencias e iniciar
+make local-install
+make local-dev
+```
+
+---
+
+## 🛠️ Comandos Disponibles
+
+### 🐳 Docker Commands
+```bash
+make docker-check      # Verificar Docker
+make dev-up           # Iniciar desarrollo con Docker
+make dev-down         # Parar desarrollo
+make dev-build        # Construir imágenes
+make dev-logs         # Ver logs
+make up               # Producción
+make down             # Parar producción
+```
+
+### 💻 Local Development Commands
+```bash
+make local-install    # Instalar dependencias
+make local-dev        # Iniciar desarrollo local
+make start-backend    # Solo backend
+make start-frontend   # Solo frontend
+make start-storybook  # Documentación UI
+make start-db-docker  # Solo DB en Docker
+make stop-db-docker   # Parar DB Docker
+```
+
+---
+
+## 🔧 Configuración
 
 # O manualmente
 docker compose -f docker-compose.dev.yml up -d --build

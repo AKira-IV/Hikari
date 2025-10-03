@@ -24,7 +24,7 @@ export function CaptchaProvider({ children }: CaptchaProviderProps) {
         defer: true,
       },
     }),
-    [siteKey],
+    [], // siteKey es una constante, no necesita dependency
   );
 
   if (!isEnabled) {

@@ -1,29 +1,88 @@
-﻿'use client';
+﻿"use client";
 
-import { ButtonHTMLAttributes, forwardRef } from 'react';
-import clsx from 'clsx';
+import { ButtonHTMLAttributes, forwardRef, CSSProperties } from "react";
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+export type ButtonVariant = "primary" | "secondary" | "ghost";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   fullWidth?: boolean;
+  style?: CSSProperties;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ children, className, variant = 'primary', fullWidth, disabled, ...rest }, ref) => {
-    const baseClasses = 'inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60';
-    const variants: Record<ButtonVariant, string> = {
-      primary: 'bg-sky-500 text-slate-900 hover:bg-sky-400 focus-visible:outline-sky-300',
-      secondary: 'bg-slate-800 text-slate-50 hover:bg-slate-700 focus-visible:outline-slate-500',
-      ghost: 'bg-transparent text-slate-200 hover:bg-slate-800 focus-visible:outline-slate-500',
+  ({ children, style, variant = "primary", fullWidth, disabled, ...rest }, ref) => {
+    const getVariantStyles = (): CSSProperties => {
+      const base: CSSProperties = {
+        padding: fullWidth ? 'var(--space-4)' : 'var(--space-3) var(--space-6)',
+        borderRadius: 'var(--radius-md)',
+        fontSize: '0.95rem',
+        fontWeight: '600',
+        border: '1px solid transparent',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        transition: 'all 0.15s ease',
+        opacity: disabled ? 0.6 : 1,
+        width: fullWidth ? '100%' : 'auto',
+        fontFamily: 'var(--font-family-base)',
+        letterSpacing: '0.01em',
+      };
+
+      switch (variant) {
+        case "primary":
+          return {
+            ...base,
+            backgroundColor: 'var(--color-primary)',
+            color: 'var(--color-primary-foreground)',
+            boxShadow: 'var(--shadow-sm)',
+          };
+        case "secondary":
+          return {
+            ...base,
+            backgroundColor: 'var(--color-surface)',
+            color: 'var(--color-text)',
+            border: '1px solid var(--color-border)',
+            boxShadow: 'var(--shadow-sm)',
+          };
+        case "ghost":
+          return {
+            ...base,
+            backgroundColor: 'transparent',
+            color: 'var(--color-text)',
+          };
+      }
     };
 
     return (
       <button
         ref={ref}
-        className={clsx(baseClasses, variants[variant], fullWidth && 'w-full', className)}
+        style={{ ...getVariantStyles(), ...style }}
         disabled={disabled}
+        onMouseEnter={(e) => {
+          if (!disabled) {
+            if (variant === "primary") {
+              e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+            } else if (variant === "secondary") {
+              e.currentTarget.style.backgroundColor = 'var(--color-secondary-hover)';
+            } else if (variant === "ghost") {
+              e.currentTarget.style.backgroundColor = 'var(--color-surface-subtle)';
+            }
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!disabled) {
+            if (variant === "primary") {
+              e.currentTarget.style.backgroundColor = 'var(--color-primary)';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+            } else if (variant === "secondary") {
+              e.currentTarget.style.backgroundColor = 'var(--color-surface)';
+            } else if (variant === "ghost") {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }
+          }
+        }}
         {...rest}
       >
         {children}
@@ -32,4 +91,4 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   },
 );
 
-Button.displayName = 'Button';
+Button.displayName = "Button";

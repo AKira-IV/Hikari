@@ -2,6 +2,8 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { CaptchaProvider } from '@/components/providers/captcha-provider';
+import { ThemeProvider } from '@/components/providers/theme-provider';
+import { AuthProvider } from '@/components/providers/auth-context';
 import { SiteHeader } from '@/components/layout/site-header';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -15,16 +17,27 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
-      <body className={`${inter.className} bg-slate-950 text-slate-100`}>
-        <CaptchaProvider>
-          <div className="flex min-h-screen flex-col">
-            <SiteHeader />
-            <main className="flex-1">{children}</main>
-            <footer className="border-t border-slate-800/60 bg-slate-950/60 py-6 text-center text-sm text-slate-500">
-              © {new Date().getFullYear()} Hikari Cloud. Todos los derechos reservados.
-            </footer>
-          </div>
-        </CaptchaProvider>
+      <body className={inter.className} style={{ backgroundColor: 'var(--color-background)', color: 'var(--color-text)' }}>
+        <ThemeProvider>
+          <AuthProvider>
+            <CaptchaProvider>
+              <div style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}>
+                <SiteHeader />
+                <main style={{ flex: 1 }}>{children}</main>
+                <footer style={{
+                  borderTop: '1px solid var(--color-border)',
+                  backgroundColor: 'var(--color-surface)',
+                  padding: 'var(--space-5) 0',
+                  textAlign: 'center',
+                  fontSize: '0.875rem',
+                  color: 'var(--color-text-muted)'
+                }}>
+                  © {new Date().getFullYear()} Hikari Cloud. Todos los derechos reservados.
+                </footer>
+              </div>
+            </CaptchaProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

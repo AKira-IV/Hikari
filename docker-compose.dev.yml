@@ -32,6 +32,30 @@ services:
     command: ["npm", "run", "start:dev"]
     restart: unless-stopped
 
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
+    depends_on:
+      - backend-dev
+    volumes:
+      - ./frontend/app:/usr/src/app/app
+      - ./frontend/components:/usr/src/app/components
+      - ./frontend/lib:/usr/src/app/lib
+      - ./frontend/config:/usr/src/app/config
+      - ./frontend/public:/usr/src/app/public
+      - ./frontend/package.json:/usr/src/app/package.json
+      - ./frontend/package-lock.json:/usr/src/app/package-lock.json
+      - /usr/src/app/node_modules
+      - /usr/src/app/.next
+    command: ["npm", "run", "dev"]
+    restart: unless-stopped
+
   db-dev:
     image: postgres:15-alpine
     environment:

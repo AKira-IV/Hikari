@@ -53,7 +53,7 @@ export function RegisterForm() {
 
   return (
     <form className="space-y-4" onSubmit={onSubmit} noValidate>
-      {formError ? <Alert variant="error">{formError}</Alert> : null}
+      {formError ? <Alert variant="danger">{formError}</Alert> : null}
       {success ? <Alert variant="success">{success}</Alert> : null}
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">

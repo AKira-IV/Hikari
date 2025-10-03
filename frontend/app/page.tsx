@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, CardHeader } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 const highlights = [
   {
@@ -27,49 +28,134 @@ const highlights = [
 export default function HomePage() {
   return (
     <>
-      <section className="relative overflow-hidden border-b border-slate-800/60 bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.2),_transparent_55%)]" />
-        <div className="relative mx-auto flex max-w-6xl flex-col gap-10 px-4 py-24 md:px-8 md:py-32">
-          <div className="max-w-3xl space-y-6">
-            <span className="inline-flex items-center rounded-full border border-green-500/50 bg-green-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-green-200">
+      <section style={{
+        position: 'relative',
+        overflow: 'hidden',
+        borderBottom: '1px solid var(--color-border)',
+        backgroundColor: 'var(--color-background)',
+        background: 'linear-gradient(to bottom, var(--color-background), var(--color-surface-subtle))'
+      }}>
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'radial-gradient(circle at top, var(--color-primary-alpha), transparent 55%)'
+        }} />
+        <div style={{
+          position: 'relative',
+          margin: '0 auto',
+          display: 'flex',
+          maxWidth: '1200px',
+          flexDirection: 'column',
+          gap: 'var(--space-10)',
+          padding: 'var(--space-12) var(--space-6)',
+        }}>
+          <div style={{ maxWidth: '768px', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              borderRadius: 'var(--radius-xl)',
+              border: '1px solid var(--color-success)',
+              backgroundColor: 'rgba(163, 190, 140, 0.1)',
+              padding: 'var(--space-1) var(--space-3)',
+              fontSize: '0.75rem',
+              fontWeight: '600',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              color: 'var(--color-success)',
+              width: 'fit-content'
+            }}>
               Sistema Gratuito 2025
             </span>
-            <h1 className="text-4xl font-bold tracking-tight text-slate-50 md:text-5xl">
+            <h1 style={{
+              fontSize: 'clamp(2rem, 5vw, 3rem)',
+              fontWeight: '700',
+              lineHeight: '1.1',
+              color: 'var(--color-text)',
+              fontFamily: 'var(--font-family-base)',
+              margin: 0
+            }}>
               Sistema de Gestión Hospitalaria 100% Gratuito para Centros de Salud
             </h1>
-            <p className="text-lg text-slate-300 md:text-xl">
+            <p style={{
+              fontSize: 'clamp(1rem, 3vw, 1.25rem)',
+              color: 'var(--color-text-muted)',
+              lineHeight: '1.6',
+              margin: 0
+            }}>
               Hikari es un sistema completamente gratuito y de código abierto diseñado para hospitales públicos,
               centros de salud rurales y clínicas comunitarias en países en desarrollo.
               Sin costos de licencia, para siempre.
             </p>
-            <div className="flex flex-wrap items-center gap-4">
-              <Link
-                href="/register"
-                className="rounded-md bg-green-500 px-5 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-green-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-300"
-              >
-                Comenzar Gratis Ahora
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--space-4)' }}>
+              <Link href="/register" style={{ textDecoration: 'none' }}>
+                <Button
+                  variant="primary"
+                  style={{
+                    fontSize: '1rem',
+                    padding: 'var(--space-4) var(--space-6)',
+                    backgroundColor: 'var(--color-success)',
+                    borderColor: 'var(--color-success)'
+                  }}
+                >
+                  Comenzar Gratis Ahora
+                </Button>
               </Link>
-              <Link
-                href="/login"
-                className="rounded-md border border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500"
-              >
-                Iniciar sesión
+              <Link href="/login" style={{ textDecoration: 'none' }}>
+                <Button
+                  variant="secondary"
+                  style={{
+                    fontSize: '1rem',
+                    padding: 'var(--space-4) var(--space-6)'
+                  }}
+                >
+                  Iniciar sesión
+                </Button>
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="features" className="border-b border-slate-800/60 bg-slate-950">
-        <div className="mx-auto max-w-6xl px-4 py-20 md:px-8">
-          <div className="mb-12 max-w-3xl space-y-4">
-            <h2 className="text-3xl font-semibold text-slate-100 md:text-4xl">Diseñado para la salud mundial</h2>
-            <p className="text-base text-slate-400">
+      <section id="features" style={{
+        borderBottom: '1px solid var(--color-border)',
+        backgroundColor: 'var(--color-background)'
+      }}>
+        <div style={{
+          margin: '0 auto',
+          maxWidth: '1200px',
+          padding: 'var(--space-12) var(--space-6)'
+        }}>
+          <div style={{
+            marginBottom: 'var(--space-12)',
+            maxWidth: '768px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--space-4)'
+          }}>
+            <h2 style={{
+              fontSize: 'clamp(1.875rem, 4vw, 2.5rem)',
+              fontWeight: '600',
+              color: 'var(--color-text)',
+              fontFamily: 'var(--font-family-base)',
+              margin: 0
+            }}>
+              Diseñado para la salud mundial
+            </h2>
+            <p style={{
+              fontSize: '1rem',
+              color: 'var(--color-text-muted)',
+              lineHeight: '1.6',
+              margin: 0
+            }}>
               Sistema completamente gratuito para hospitales públicos, centros de salud rurales y clínicas comunitarias.
               Tecnología de calidad mundial accesible para todos.
             </p>
           </div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div style={{
+            display: 'grid',
+            gap: 'var(--space-6)',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))'
+          }}>
             {highlights.map((item) => (
               <Card key={item.title}>
                 <CardHeader title={item.title} subtitle={item.description} />
@@ -79,25 +165,108 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="security" className="border-b border-slate-800/60 bg-slate-900">
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-20 md:grid-cols-2 md:px-8">
-          <div className="space-y-4">
-            <h3 className="text-2xl font-semibold text-slate-100">Seguridad y transparencia garantizadas</h3>
-            <ul className="space-y-3 text-sm text-slate-300">
-              <li>• Cumplimiento completo OWASP Top 10 para máxima seguridad.</li>
-              <li>• Código 100% abierto para auditoría y transparencia total.</li>
-              <li>• Protección reCAPTCHA v3 contra ataques automatizados.</li>
-              <li>• Auditoría multi-tenant con alertas y métricas exportables.</li>
-              <li>• Validación anti-inyección y sanitización centralizada.</li>
+      <section id="security" style={{
+        borderBottom: '1px solid var(--color-border)',
+        backgroundColor: 'var(--color-surface-subtle)'
+      }}>
+        <div style={{
+          margin: '0 auto',
+          display: 'grid',
+          maxWidth: '1200px',
+          gap: 'var(--space-10)',
+          padding: 'var(--space-12) var(--space-6)',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))'
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+            <h3 style={{
+              fontSize: '2rem',
+              fontWeight: '600',
+              color: 'var(--color-text)',
+              fontFamily: 'var(--font-family-base)',
+              margin: 0
+            }}>
+              Seguridad y transparencia garantizadas
+            </h3>
+            <ul style={{
+              listStyle: 'none',
+              padding: 0,
+              margin: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'var(--space-3)'
+            }}>
+              <li style={{
+                fontSize: '0.95rem',
+                color: 'var(--color-text-muted)',
+                lineHeight: '1.5',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 'var(--space-2)'
+              }}>
+                <span style={{ color: 'var(--color-primary)', marginTop: '2px' }}>•</span>
+                Cumplimiento completo OWASP Top 10 para máxima seguridad.
+              </li>
+              <li style={{
+                fontSize: '0.95rem',
+                color: 'var(--color-text-muted)',
+                lineHeight: '1.5',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 'var(--space-2)'
+              }}>
+                <span style={{ color: 'var(--color-success)', marginTop: '2px' }}>•</span>
+                Código 100% abierto para auditoría y transparencia total.
+              </li>
+              <li style={{
+                fontSize: '0.95rem',
+                color: 'var(--color-text-muted)',
+                lineHeight: '1.5',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 'var(--space-2)'
+              }}>
+                <span style={{ color: 'var(--color-info)', marginTop: '2px' }}>•</span>
+                Protección reCAPTCHA v3 contra ataques automatizados.
+              </li>
+              <li style={{
+                fontSize: '0.95rem',
+                color: 'var(--color-text-muted)',
+                lineHeight: '1.5',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 'var(--space-2)'
+              }}>
+                <span style={{ color: 'var(--color-warning)', marginTop: '2px' }}>•</span>
+                Auditoría multi-tenant con alertas y métricas exportables.
+              </li>
+              <li style={{
+                fontSize: '0.95rem',
+                color: 'var(--color-text-muted)',
+                lineHeight: '1.5',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 'var(--space-2)'
+              }}>
+                <span style={{ color: 'var(--color-danger)', marginTop: '2px' }}>•</span>
+                Validación anti-inyección y sanitización centralizada.
+              </li>
             </ul>
           </div>
-          <Card className="bg-slate-900/80">
+          <Card style={{ backgroundColor: 'var(--color-surface)' }}>
             <CardHeader
               title="API REST completa y documentada"
               subtitle="Documentación Swagger automática para integración fácil con sistemas existentes en tu hospital."
             />
-            <div className="rounded-lg border border-slate-800 bg-slate-950 p-4 font-mono text-xs text-slate-300">
-              <pre>
+            <div style={{
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--color-border)',
+              backgroundColor: 'var(--color-surface-subtle)',
+              padding: 'var(--space-4)',
+              fontFamily: 'monospace',
+              fontSize: '0.75rem',
+              color: 'var(--color-text-muted)'
+            }}>
+              <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>
                 <code>{`POST /auth/login
 Content-Type: application/json
 X-Tenant-Subdomain: demo
@@ -116,34 +285,80 @@ X-Tenant-Subdomain: demo
         </div>
       </section>
 
-      <section id="commitment" className="bg-slate-950">
-        <div className="mx-auto max-w-6xl px-4 py-20 md:px-8">
-          <div className="text-center space-y-8">
-            <h3 className="text-3xl font-semibold text-slate-100">Compromiso de Gratuidad Total</h3>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">
+      <section id="commitment" style={{ backgroundColor: 'var(--color-background)' }}>
+        <div style={{
+          margin: '0 auto',
+          maxWidth: '1200px',
+          padding: 'var(--space-12) var(--space-6)'
+        }}>
+          <div style={{
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--space-8)'
+          }}>
+            <h3 style={{
+              fontSize: '3rem',
+              fontWeight: '600',
+              color: 'var(--color-text)',
+              fontFamily: 'var(--font-family-base)',
+              margin: 0
+            }}>
+              Compromiso de Gratuidad Total
+            </h3>
+            <p style={{
+              fontSize: '1.125rem',
+              color: 'var(--color-text-muted)',
+              maxWidth: '768px',
+              margin: '0 auto',
+              lineHeight: '1.6'
+            }}>
               Hikari es y siempre será completamente gratuito. Nuestro compromiso es con la salud mundial,
               especialmente para centros de salud que más lo necesitan.
             </p>
           </div>
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            <Card className="bg-green-900/20 border-green-500/30">
+          <div style={{
+            marginTop: 'var(--space-12)',
+            display: 'grid',
+            gap: 'var(--space-6)',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))'
+          }}>
+            <Card style={{
+              backgroundColor: 'rgba(163, 190, 140, 0.1)',
+              borderColor: 'var(--color-success)'
+            }}>
               <CardHeader
                 title="Para Todos"
                 subtitle="Sistema gratuito para hospitales públicos, centros rurales, clínicas comunitarias y organizaciones humanitarias en todo el mundo."
               />
-              <div className="space-y-2 text-sm text-green-200">
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--space-2)',
+                fontSize: '0.95rem',
+                color: 'var(--color-success)'
+              }}>
                 <div>• Sin costos de licencia</div>
                 <div>• Sin límites de usuarios</div>
                 <div>• Sin restricciones comerciales</div>
                 <div>• Código 100% abierto</div>
               </div>
             </Card>
-            <Card className="bg-blue-900/20 border-blue-500/30">
+            <Card style={{
+              backgroundColor: 'var(--color-primary-alpha)',
+              borderColor: 'var(--color-primary)'
+            }}>
               <CardHeader
                 title="Casos de Uso"
                 subtitle="Perfecto para digitalizar procesos hospitalarios en centros de salud con recursos limitados."
               />
-              <div className="space-y-2 text-sm text-blue-200">
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--space-2)',
+                fontSize: '0.95rem',
+                color: 'var(--color-primary)'
+              }}>
                 <div>• Gestión de pacientes</div>
                 <div>• Agenda de citas médicas</div>
                 <div>• Control de profesionales</div>
@@ -151,12 +366,21 @@ X-Tenant-Subdomain: demo
                 <div>• Reportes y estadísticas</div>
               </div>
             </Card>
-            <Card className="bg-purple-900/20 border-purple-500/30">
+            <Card style={{
+              backgroundColor: 'rgba(235, 203, 139, 0.1)',
+              borderColor: 'var(--color-warning)'
+            }}>
               <CardHeader
                 title="Comunidad"
                 subtitle="Desarrollado por y para la comunidad médica mundial. Contribuciones bienvenidas."
               />
-              <div className="space-y-2 text-sm text-purple-200">
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--space-2)',
+                fontSize: '0.95rem',
+                color: 'var(--color-warning)'
+              }}>
                 <div>• Reportar bugs</div>
                 <div>• Sugerir mejoras</div>
                 <div>• Contribuir código</div>
@@ -165,9 +389,20 @@ X-Tenant-Subdomain: demo
               </div>
             </Card>
           </div>
-          <div className="mt-12 text-center">
-            <div className="inline-flex items-center gap-4 rounded-full bg-green-500/10 border border-green-500/30 px-6 py-3">
-              <span className="text-green-400 font-semibold">
+          <div style={{ marginTop: 'var(--space-12)', textAlign: 'center' }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 'var(--space-4)',
+              borderRadius: 'var(--radius-xl)',
+              backgroundColor: 'rgba(163, 190, 140, 0.1)',
+              border: '1px solid var(--color-success)',
+              padding: 'var(--space-6)',
+            }}>
+              <span style={{
+                color: 'var(--color-success)',
+                fontWeight: '600'
+              }}>
                 Si Hikari ayuda a tu centro de salud, ¡comparte tu experiencia!
               </span>
             </div>
