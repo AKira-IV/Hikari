@@ -86,32 +86,31 @@ export class SeedService {
     );
 
     try {
-      // GOOD: Try to create directly, trust constraints
-      await this.userRepository
-        .createQueryBuilder()
-        .insert()
-        .into(User)
-        .values({
-          email: 'admin@demo.com',
-          password,
-          firstName: 'Admin',
-          lastName: 'Demo',
-          role: UserRole.ADMIN,
-          tenantId,
-          isActive: true,
-        })
-        .orIgnore() // Si ya existe, ignorar
-        .execute();
+      // Check if user already exists
+      const existingUser = await this.userRepository.findOne({
+        where: { email: 'admin@demo.com' },
+      });
 
-      // Solo log si la operación fue exitosa
-      this.logCredential('admin@demo.com', password, 'SEED_ADMIN_PASSWORD');
-    } catch (error: unknown) {
-      // Si el constraint falla, es que ya existe
-      if (this.isUniqueConstraintError(error)) {
-        console.log('Admin user already exists (constraint)');
+      if (existingUser) {
+        console.log('Admin user already exists');
         return;
       }
-      console.error('Failed to upsert admin user:', error);
+
+      // Create new user using save() to trigger @BeforeInsert hooks
+      const adminUser = this.userRepository.create({
+        email: 'admin@demo.com',
+        password,
+        firstName: 'Admin',
+        lastName: 'Demo',
+        role: UserRole.ADMIN,
+        tenantId,
+        isActive: true,
+      });
+
+      await this.userRepository.save(adminUser);
+      this.logCredential('admin@demo.com', password, 'SEED_ADMIN_PASSWORD');
+    } catch (error: unknown) {
+      console.error('Failed to create admin user:', error);
       throw error;
     }
   }
@@ -123,31 +122,32 @@ export class SeedService {
     );
 
     try {
-      await this.userRepository
-        .createQueryBuilder()
-        .insert()
-        .into(User)
-        .values({
-          email: 'doctor@demo.com',
-          password,
-          firstName: 'Dr. Juan',
-          lastName: 'Perez',
-          role: UserRole.DOCTOR,
-          tenantId,
-          isActive: true,
-          phone: '+1234567890',
-        })
-        .orIgnore()
-        .execute();
+      // Check if user already exists
+      const existingUser = await this.userRepository.findOne({
+        where: { email: 'doctor@demo.com' },
+      });
 
-      // Solo log si la operación fue exitosa
-      this.logCredential('doctor@demo.com', password, 'SEED_DOCTOR_PASSWORD');
-    } catch (error: unknown) {
-      if (this.isUniqueConstraintError(error)) {
-        console.log('Doctor user already exists (constraint)');
+      if (existingUser) {
+        console.log('Doctor user already exists');
         return;
       }
-      console.error('Failed to upsert doctor user:', error);
+
+      // Create new user using save() to trigger @BeforeInsert hooks
+      const doctorUser = this.userRepository.create({
+        email: 'doctor@demo.com',
+        password,
+        firstName: 'Dr. Juan',
+        lastName: 'Perez',
+        role: UserRole.DOCTOR,
+        tenantId,
+        isActive: true,
+        phone: '+1234567890',
+      });
+
+      await this.userRepository.save(doctorUser);
+      this.logCredential('doctor@demo.com', password, 'SEED_DOCTOR_PASSWORD');
+    } catch (error: unknown) {
+      console.error('Failed to create doctor user:', error);
       throw error;
     }
   }
@@ -159,31 +159,32 @@ export class SeedService {
     );
 
     try {
-      await this.userRepository
-        .createQueryBuilder()
-        .insert()
-        .into(User)
-        .values({
-          email: 'nurse@demo.com',
-          password,
-          firstName: 'Maria',
-          lastName: 'Gonzalez',
-          role: UserRole.NURSE,
-          tenantId,
-          isActive: true,
-          phone: '+1234567891',
-        })
-        .orIgnore()
-        .execute();
+      // Check if user already exists
+      const existingUser = await this.userRepository.findOne({
+        where: { email: 'nurse@demo.com' },
+      });
 
-      // Solo log si la operación fue exitosa
-      this.logCredential('nurse@demo.com', password, 'SEED_NURSE_PASSWORD');
-    } catch (error: unknown) {
-      if (this.isUniqueConstraintError(error)) {
-        console.log('Nurse user already exists (constraint)');
+      if (existingUser) {
+        console.log('Nurse user already exists');
         return;
       }
-      console.error('Failed to upsert nurse user:', error);
+
+      // Create new user using save() to trigger @BeforeInsert hooks
+      const nurseUser = this.userRepository.create({
+        email: 'nurse@demo.com',
+        password,
+        firstName: 'Maria',
+        lastName: 'Gonzalez',
+        role: UserRole.NURSE,
+        tenantId,
+        isActive: true,
+        phone: '+1234567891',
+      });
+
+      await this.userRepository.save(nurseUser);
+      this.logCredential('nurse@demo.com', password, 'SEED_NURSE_PASSWORD');
+    } catch (error: unknown) {
+      console.error('Failed to create nurse user:', error);
       throw error;
     }
   }
