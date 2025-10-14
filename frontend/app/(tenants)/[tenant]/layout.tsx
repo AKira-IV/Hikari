@@ -41,7 +41,7 @@ export default function TenantLayout({ children, params }: TenantLayoutProps) {
               letterSpacing: '0.05em',
               color: 'var(--color-text-muted)'
             }}>
-              Tenant seleccionado
+                            CENTRO DE SALUD SELECCIONADO
             </p>
             <h1 style={{
               fontSize: '1.875rem',

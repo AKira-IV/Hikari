@@ -1,6 +1,10 @@
+'use client';
+
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/components/providers/auth-context';
 
 const highlights = [
   {
@@ -26,6 +30,50 @@ const highlights = [
 ];
 
 export default function HomePage() {
+  const { user, isLoading } = useAuth();
+
+  // Redirigir usuarios autenticados al dashboard
+  useEffect(() => {
+    if (!isLoading && user) {
+      window.location.href = `/${user.tenant.subdomain}/dashboard`;
+    }
+  }, [user, isLoading]);
+
+  // Mostrar loading mientras se verifica la autenticación
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        backgroundColor: 'var(--color-background)'
+      }}>
+        <div style={{
+          padding: 'var(--space-8)',
+          textAlign: 'center'
+        }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            border: '4px solid var(--color-border)',
+            borderTop: '4px solid var(--color-primary)',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto var(--space-4) auto'
+          }} />
+          <p style={{ color: 'var(--color-text-muted)' }}>Verificando sesión...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Si el usuario está autenticado, no mostrar nada (se está redirigiendo)
+  if (user) {
+    return null;
+  }
+
+  // Solo mostrar la landing page si el usuario no está autenticado
   return (
     <>
       <section style={{

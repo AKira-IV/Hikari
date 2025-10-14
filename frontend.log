@@ -1,0 +1,46 @@
+nohup: no se tendrá en cuenta la entrada
+[0;34m🚀 Iniciando Frontend Hikari (Modo Robusto)[0m
+[0;34m💾 Memoria disponible: 1900MB[0m
+[1;33m🧹 Limpiando procesos anteriores...[0m
+[0;31m❌ Puerto 3001 en uso. Liberando...[0m
+[1;33m🗑️  Limpiando cache de Next.js...[0m
+[0;34m🔧 Configuraciones aplicadas:[0m
+   Node memory limit: 1024
+   Telemetry: disabled
+   Puerto: 3001
+
+[0;32m🎯 Iniciando servidor de desarrollo...[0m
+
+> frontend@0.2.0 dev
+> next dev -p 3001
+
+  ▲ Next.js 14.2.33
+  - Local:        http://localhost:3001
+[0;32m✅ Frontend listo en http://localhost:3001[0m
+  - Environments: .env
+  - Experiments (use with caution):
+    · typedRoutes
+
+ ✓ Starting...
+ ⚠ Disabling SWC Minifer will not be an option in the next major version. Please report any issues you may be experiencing to https://github.com/vercel/next.js/issues
+ ✓ Ready in 3.2s
+[0;32m✅ Frontend listo en http://localhost:3001[0m
+ ○ Compiling / ...
+ ✓ Compiled / in 5.2s (543 modules)
+ThemeToggle used outside ThemeProvider
+ GET / 200 in 5821ms
+ ○ Compiling /[tenant] ...
+ ✓ Compiled /[tenant]/dashboard in 8.1s (543 modules)
+ThemeToggle used outside ThemeProvider
+ThemeToggle used outside ThemeProvider
+ GET /demo/dashboard 200 in 8453ms
+ThemeToggle used outside ThemeProvider
+ GET /favicon.ico 200 in 74ms
+ThemeToggle used outside ThemeProvider
+ GET / 200 in 67ms
+ThemeToggle used outside ThemeProvider
+ GET / 200 in 81ms
+ThemeToggle used outside ThemeProvider
+ GET /favicon.ico 200 in 76ms
+ThemeToggle used outside ThemeProvider
+ GET / 200 in 51ms

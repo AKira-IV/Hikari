@@ -53,13 +53,22 @@ fi
 
 # Verificar frontend
 if ! check_port 3001 "Frontend"; then
-    echo -e "${YELLOW}🔧 Iniciando frontend...${NC}"
+    echo -e "${YELLOW}🔧 Iniciando frontend (modo optimizado)...${NC}"
     cd frontend
-    npm run dev &
+    
+    # Detectar memoria disponible y usar modo apropiado
+    AVAILABLE_MEM=$(free -m | awk 'NR==2{printf "%.0f", $7}')
+    if [ "$AVAILABLE_MEM" -lt 800 ]; then
+        echo -e "${YELLOW}💾 Memoria limitada ($AVAILABLE_MEM MB). Usando modo de baja memoria...${NC}"
+        nohup npm run dev:low-memory > frontend.log 2>&1 &
+    else
+        nohup npm run dev > frontend.log 2>&1 &
+    fi
+    
     FRONTEND_PID=$!
     echo -e "${GREEN}✅ Frontend iniciado (PID: $FRONTEND_PID)${NC}"
     cd ..
-    sleep 5
+    sleep 8
 fi
 
 echo -e "\n${BLUE}🌐 Verificando accesibilidad...${NC}"
